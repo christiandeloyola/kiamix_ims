@@ -728,6 +728,7 @@
                                         <th>Contact Person</th>
                                         <th>Phone</th>
                                         <th>Email</th>
+                                        <th>Address</th>
                                         <th>Items Supplied</th>
                                         <th>Actions</th>
                                     </tr>
