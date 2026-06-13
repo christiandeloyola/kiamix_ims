@@ -1020,6 +1020,11 @@ async function viewInventoryItem(itemId){
                     </p>
 
                     <p>
+                        <strong>Supplier:</strong>
+                        ${item.supplier_name || 'N/A'}
+                    </p>
+
+                    <p>
                         <strong>Status:</strong>
 
                         <span class="status-badge ${statusClass}">
