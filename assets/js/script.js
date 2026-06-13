@@ -1411,13 +1411,30 @@ async function editInventoryItem(itemId){
 
 }
 
-function loadSuppliersForSelect(selectedSupplier = '') {
-    const suppliers = JSON.parse(localStorage.getItem('coffeeShopSuppliers') || '[]');
-    let options = '<option value="">Select a supplier</option>';
-    suppliers.forEach(supplier => {
-        const selected = supplier.name === selectedSupplier ? 'selected' : '';
-        options += `<option value="${supplier.name}" ${selected}>${supplier.name}</option>`;
+function loadSuppliersForSelect(
+    selectedSupplierId = ''
+) {
+
+    let options =
+        '<option value="">Select a supplier</option>';
+
+    supplierData.forEach(supplier => {
+
+        const selected =
+            Number(supplier.id) === Number(selectedSupplierId)
+                ? 'selected'
+                : '';
+
+        options += `
+            <option
+                value="${supplier.id}"
+                ${selected}
+            >
+                ${supplier.supplier_name}
+            </option>
+        `;
     });
+
     return options;
 }
 
