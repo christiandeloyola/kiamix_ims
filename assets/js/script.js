@@ -1107,6 +1107,7 @@ async function loadSuppliersForDropdowns() {
         );
 
         const suppliers = await response.json();
+        supplierData = suppliers;
         console.log('Suppliers API:', suppliers);
 
         const itemSupplierSelect =
@@ -1197,6 +1198,8 @@ async function loadSuppliersForDropdowns() {
 }
 
 async function editInventoryItem(itemId){
+
+    await loadSuppliersForDropdowns();
 
     try{
 
@@ -1411,9 +1414,7 @@ async function editInventoryItem(itemId){
 
 }
 
-function loadSuppliersForSelect(
-    selectedSupplierId = ''
-) {
+function loadSuppliersForSelect(selectedSupplierId = '') {
 
     let options =
         '<option value="">Select a supplier</option>';
