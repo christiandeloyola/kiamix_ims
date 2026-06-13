@@ -3056,6 +3056,7 @@ async function loadSuppliers() {
                 <td>${supplier.contact_person}</td>
                 <td>${supplier.phone}</td>
                 <td>${supplier.email}</td>
+                <td>${supplier.address || ''}</td>
                 <td>${supplier.supplied_items}</td>
 
                 <td>
