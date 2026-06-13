@@ -981,6 +981,8 @@ async function viewInventoryItem(itemId){
         modal.className =
             'modal-overlay';
 
+        console.log(item);
+
         modal.innerHTML = `
 
             <div class="modal-content">
