@@ -3018,7 +3018,7 @@ async function loadSuppliers() {
 
     suppliersContainer.innerHTML = `
         <tr>
-            <td colspan="7">Loading suppliers...</td>
+            <td colspan="8">Loading suppliers...</td>
         </tr>
     `;
 
@@ -3036,7 +3036,7 @@ async function loadSuppliers() {
 
             suppliersContainer.innerHTML = `
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         No suppliers found
                     </td>
                 </tr>
@@ -3165,7 +3165,7 @@ async function loadSuppliers() {
 
         suppliersContainer.innerHTML = `
             <tr>
-                <td colspan="7">
+                <td colspan="8">
                     Error loading suppliers
                 </td>
             </tr>
