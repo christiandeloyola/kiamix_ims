@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supplier Create</title>
+</head>
+<body>
+
+<h2>Create Supplier Test</h2>
+
+<button onclick="createSupplier()">
+    Create Supplier
+</button>
+
+<script>
+
+async function createSupplier(){
+
+    const response = await fetch(
+        "api/suppliers/create.php",
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                supplier_name:"Coffee Supply Inc",
+                contact_person:"Juan Dela Cruz",
+                phone:"09123456789",
+                email:"coffee@supply.com",
+                address:"Quezon City",
+                supplied_items:"Arabica Beans, Robusta Beans"
+            })
+        }
+    );
+
+    const result = await response.json();
+
+    console.log(result);
+
+    alert(result.message);
+}
+
+</script>
+
+</body>
+</html>
