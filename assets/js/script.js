@@ -1208,6 +1208,8 @@ async function editInventoryItem(itemId){
         const item =
             await response.json();
 
+        console.log('Inventory Item:', item);
+
         const modal =
             document.createElement('div');
 
