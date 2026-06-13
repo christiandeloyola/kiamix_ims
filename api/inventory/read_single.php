@@ -22,9 +22,12 @@ $id = intval($_GET['id']);
 $query = "
 
 SELECT
-    *
+    inventory_items.*,
+    suppliers.supplier_name
 FROM inventory_items
-WHERE id = :id
+LEFT JOIN suppliers
+ON inventory_items.supplier_id = suppliers.id
+WHERE inventory_items.id = ?
 LIMIT 1
 
 ";
