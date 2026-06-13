@@ -10,11 +10,16 @@ $db = $database->connect();
 
 $query = "
 
-SELECT *
+SELECT
+    inventory_items.*,
+    suppliers.supplier_name
 
 FROM inventory_items
 
-ORDER BY id DESC
+LEFT JOIN suppliers
+ON inventory_items.supplier_id = suppliers.id
+
+ORDER BY inventory_items.id DESC
 
 ";
 
