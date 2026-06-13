@@ -20,16 +20,14 @@ if(!isset($_GET['id'])){
 $id = intval($_GET['id']);
 
 $query = "
-
 SELECT
     inventory_items.*,
     suppliers.supplier_name
 FROM inventory_items
 LEFT JOIN suppliers
 ON inventory_items.supplier_id = suppliers.id
-WHERE inventory_items.id = ?
+WHERE inventory_items.id = :id
 LIMIT 1
-
 ";
 
 $stmt = $db->prepare($query);
