@@ -1223,3 +1223,60 @@ textarea:focus {
         height: 100px;
     }
 }
+
+.category-badge{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+/* Coffee Beans */
+.category-coffee{
+    background:#e8ddd7;
+    color:#6d4c41;
+}
+
+/* Tea & Herbal */
+.category-tea{
+    background:#d8f0d2;
+    color:#2e7d32;
+}
+
+/* Pastries & Food */
+.category-pastry{
+    background:#ffe0b2;
+    color:#ef6c00;
+}
+
+/* Syrups & Flavorings */
+.category-syrup{
+    background:#e1bee7;
+    color:#8e24aa;
+}
+
+/* Milk & Dairy */
+.category-milk{
+    background:#bbdefb;
+    color:#1565c0;
+}
+
+/* Cups & Packaging */
+.category-cups{
+    background:#ffccbc;
+    color:#f4511e;
+}
+
+/* Cleaning Supplies */
+.category-cleaning{
+    background:#cfd8dc;
+    color:#455a64;
+}
+
+/* Equipment */
+.category-equipment{
+    background:#d7ccc8;
+    color:#4e342e;
+}

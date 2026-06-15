@@ -705,7 +705,7 @@ async function loadRecentItems() {
             row.innerHTML = `
                 <td>${item.id}</td>
                 <td>${item.item_name}</td>
-                <td>${item.category}</td>
+                <td>${getCategoryBadge(item.category)}</td>
                 <td>${item.quantity} ${item.unit}</td>
                 <td>
                     <span class="status-badge ${statusClass}">
@@ -794,7 +794,7 @@ async function loadInventoryItems() {
 
                 <td>${item.item_name}</td>
 
-                <td>${item.category}</td>
+                <td>${getCategoryBadge(item.category)}</td>
 
                 <td>${item.quantity}</td>
 
@@ -1609,6 +1609,55 @@ function getCategoryName(category) {
         'equipment': 'Equipment'
     };
     return categoryNames[category] || category;
+}
+
+function getCategoryBadge(category){
+
+    let className = '';
+
+    switch(category){
+
+        case 'Coffee Beans':
+            className = 'category-coffee';
+            break;
+
+        case 'Tea & Herbal':
+            className = 'category-tea';
+            break;
+
+        case 'Pastries & Food':
+            className = 'category-pastry';
+            break;
+
+        case 'Syrups & Flavorings':
+            className = 'category-syrup';
+            break;
+
+        case 'Milk & Dairy':
+            className = 'category-milk';
+            break;
+
+        case 'Cups & Packaging':
+            className = 'category-cups';
+            break;
+
+        case 'Cleaning Supplies':
+            className = 'category-cleaning';
+            break;
+
+        case 'Equipment':
+            className = 'category-equipment';
+            break;
+
+        default:
+            className = 'category-coffee';
+    }
+
+    return `
+        <span class="category-badge ${className}">
+            ${category}
+        </span>
+    `;
 }
 
 // ============================================
