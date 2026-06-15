@@ -1237,10 +1237,16 @@ async function editInventoryItem(itemId){
             <div class="form-group">
                 <label>Category</label>
 
-                <input
-                    type="text"
-                    id="edit-category"
-                    value="${item.category}">
+                <select id="edit-category">
+                    <option value="Coffee Beans">Coffee Beans</option>
+                    <option value="Tea & Herbal">Tea & Herbal</option>
+                    <option value="Pastries & Food">Pastries & Food</option>
+                    <option value="Syrups & Flavorings">Syrups & Flavorings</option>
+                    <option value="Milk & Dairy">Milk & Dairy</option>
+                    <option value="Cups & Packaging">Cups & Packaging</option>
+                    <option value="Cleaning Supplies">Cleaning Supplies</option>
+                    <option value="Equipment">Equipment</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -1319,6 +1325,9 @@ async function editInventoryItem(itemId){
         document.body.appendChild(
             modal
         );
+
+        document.getElementById('edit-category').value =
+            item.category;
 
         document
         .getElementById(
