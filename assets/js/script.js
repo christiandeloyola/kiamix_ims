@@ -1452,6 +1452,7 @@ addItemBtn?.addEventListener('click', async function() {
 
     const name = document.getElementById('item-name').value;
     const category = document.getElementById('item-category').value;
+    console.log("Selected Category:", category);
     const unit = document.getElementById('item-unit').value;
     const quantity = parseFloat(
         document.getElementById('item-quantity').value
