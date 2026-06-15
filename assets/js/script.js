@@ -3314,7 +3314,17 @@ function showAddSupplierModal() {
                         >
                     </div>
 
-                </div>
+                    <div class="form-group">
+                        <label>
+                            <strong>Address</strong>
+                        </label>
+                        <input
+                            type="text"
+                            id="supplier-address"
+                            placeholder="Enter supplier address"
+                            style="width:100%;padding:8px;margin-top:5px;"
+                        >
+                    </div>
 
                 <div class="form-group">
                     <label>
@@ -3392,6 +3402,9 @@ function showAddSupplierModal() {
         const email =
             modal.querySelector('#supplier-email').value.trim();
 
+        const address =
+            modal.querySelector('#supplier-address').value.trim();
+
         const items =
             modal.querySelector('#supplier-items').value.trim();
 
@@ -3400,6 +3413,7 @@ function showAddSupplierModal() {
             !contact ||
             !phone ||
             !email ||
+            !address ||
             !items
         ) {
 
@@ -3427,7 +3441,7 @@ function showAddSupplierModal() {
                             contact_person: contact,
                             phone: phone,
                             email: email,
-                            address: '',
+                            address: address,
                             supplied_items: items
                         })
                     }
@@ -3579,7 +3593,17 @@ async function editSupplier(supplierId) {
                             >
                         </div>
 
-                    </div>
+                        <div class="form-group">
+                            <label>
+                                <strong>Address</strong>
+                            </label>
+                            <input
+                                type="text"
+                                id="edit-supplier-address"
+                                value="${supplier.address || ''}"
+                                style="width:100%;padding:8px;"
+                            >
+                        </div>
 
                     <div class="form-group">
                         <label>
@@ -3665,6 +3689,11 @@ async function editSupplier(supplierId) {
                     '#edit-supplier-email'
                 ).value;
 
+            const address =
+                modal.querySelector(
+                    '#edit-supplier-address'
+                ).value;
+
             const items =
                 modal.querySelector(
                     '#edit-supplier-items'
@@ -3675,6 +3704,7 @@ async function editSupplier(supplierId) {
                 !contact ||
                 !phone ||
                 !email ||
+                !address ||
                 !items
             ) {
 
@@ -3703,7 +3733,7 @@ async function editSupplier(supplierId) {
                                 contact_person: contact,
                                 phone: phone,
                                 email: email,
-                                address: '',
+                                address: address,
                                 supplied_items: items
                             })
                         }
