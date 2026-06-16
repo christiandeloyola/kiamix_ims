@@ -2630,7 +2630,20 @@ function viewOrderDetails(orderId) {
 
     .then(response => response.json())
 
-    .then(order => {
+    .then(result => {
+
+        if(!result.success){
+            showNotification(
+                result.message || 'Purchase Order not found',
+                'error'
+            );
+            return;
+        }
+
+        const order = result.data;
+
+        console.log('ORDER:', order);
+        console.log('ITEMS:', order.items);
 
         let itemsHtml = '';
 
