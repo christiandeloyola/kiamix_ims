@@ -1,6 +1,11 @@
 <?php
 
+header("Content-Type: application/json");
+
 include_once "../../config/database.php";
+
+$database = new Database();
+$db = $database->connect();
 
 $query = "
 SELECT po_number
@@ -9,7 +14,7 @@ ORDER BY id DESC
 LIMIT 1
 ";
 
-$stmt = $conn->prepare($query);
+$stmt = $db->prepare($query);
 $stmt->execute();
 
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
