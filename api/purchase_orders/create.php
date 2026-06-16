@@ -25,7 +25,12 @@ try {
 
     $db->beginTransaction();
 
-    $po_number = "PO-" . time();
+    $reference_no = time();
+
+    $stmt = $db->query("SELECT COUNT(*) + 1 AS next_po FROM purchase_orders");
+    $nextPO = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $po_number = "PO" . str_pad($nextPO['next_po'], 3, '0', STR_PAD_LEFT);
 
     $total_amount = 0;
 
@@ -37,6 +42,7 @@ try {
         INSERT INTO purchase_orders
         (
             po_number,
+            reference_no,
             supplier_id,
             order_date,
             expected_date,
@@ -49,6 +55,7 @@ try {
         VALUES
         (
             :po_number,
+            :reference_no,
             :supplier_id,
             :order_date,
             :expected_date,
@@ -64,6 +71,7 @@ try {
 
     $stmt->execute([
         ":po_number" => $po_number,
+        ":reference_no" => $reference_no,
         ":supplier_id" => $data->supplier_id,
         ":order_date" => $data->order_date,
         ":expected_date" => $data->expected_date,
