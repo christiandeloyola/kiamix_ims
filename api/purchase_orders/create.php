@@ -27,10 +27,7 @@ try {
 
     $reference_no = time();
 
-    $stmt = $db->query("SELECT COUNT(*) + 1 AS next_po FROM purchase_orders");
-    $nextPO = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    $po_number = "PO" . str_pad($nextPO['next_po'], 3, '0', STR_PAD_LEFT);
+    $po_number = $data->po_number;
 
     $total_amount = 0;
 
