@@ -2,18 +2,16 @@
 
 header("Content-Type: application/json");
 
-include_once "../../config/database.php";
+include_once '../../config/database.php';
 
 $database = new Database();
 $db = $database->connect();
 
 if (!isset($_GET['id'])) {
-
     echo json_encode([
         "success" => false,
         "message" => "Purchase Order ID required"
     ]);
-
     exit;
 }
 
@@ -25,20 +23,13 @@ SELECT
     s.supplier_name
 FROM purchase_orders po
 LEFT JOIN suppliers s
-    ON po.supplier_id = s.id
-WHERE po.id = :id
+ON po.supplier_id = s.id
+WHERE po.id = ?
 LIMIT 1
 ";
 
 $stmt = $db->prepare($query);
-
-$stmt->bindParam(
-    ":id",
-    $id,
-    PDO::PARAM_INT
-);
-
-$stmt->execute();
+$stmt->execute([$id]);
 
 $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -52,11 +43,23 @@ if (!$order) {
     exit;
 }
 
-/*
-    Optional:
-    Add purchase_order_items later
-*/
+$itemQuery = "
+SELECT
+    poi.*,
+    i.item_name
+FROM purchase_order_items poi
+LEFT JOIN inventory_items i
+ON poi.inventory_item_id = i.id
+WHERE poi.purchase_order_id = ?
+";
 
-$order["items"] = [];
+$itemStmt = $db->prepare($itemQuery);
+$itemStmt->execute([$id]);
 
-echo json_encode($order);
+$order['items'] =
+    $itemStmt->fetchAll(PDO::FETCH_ASSOC);
+
+echo json_encode([
+    "success" => true,
+    "data" => $order
+]);
