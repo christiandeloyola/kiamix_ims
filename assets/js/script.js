@@ -2884,6 +2884,15 @@ function deliverPurchaseOrder(orderId){
 
 }
 
+function cancelPurchaseOrder(orderId){
+
+    updatePurchaseOrderStatus(
+        orderId,
+        'Cancelled'
+    );
+
+}
+
 function updatePurchaseOrderStatus(
     orderId,
     status
