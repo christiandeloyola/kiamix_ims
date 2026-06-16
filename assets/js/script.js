@@ -236,6 +236,26 @@ function generateUniqueReferenceNumber() {
     return refNumber;
 }
 
+async function loadNextPONumber() {
+
+    try {
+
+        const response = await fetch(
+            'api/purchase_orders/get_next_po.php'
+        );
+
+        const data = await response.json();
+
+        document.getElementById('po-number').value =
+            data.po_number;
+
+    } catch(error) {
+
+        console.error(error);
+
+    }
+}
+
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
@@ -581,7 +601,7 @@ function showPage(pageId) {
         } else if (pageId === 'settings-general') {
             loadGeneralSettings();
         } else if (pageId === 'purchase-order') {
-            document.getElementById('po-number').value = generatePONumber();
+            loadNextPONumber();
             loadSuppliersForDropdowns();
             clearAttachments();
             const poSupplierSelect = document.getElementById('po-supplier');
@@ -1896,7 +1916,7 @@ function clearPurchaseOrderForm() {
     const deleteBtnContainer = firstItem.querySelector('.form-group:last-child');
     if (deleteBtnContainer) deleteBtnContainer.style.visibility = 'hidden';
     
-    document.getElementById('po-number').value = generatePONumber();
+    loadNextPONumber();
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('po-date').value = today;
     
