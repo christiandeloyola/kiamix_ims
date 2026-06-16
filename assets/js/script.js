@@ -2368,6 +2368,16 @@ function loadPurchaseOrders() {
 
                 ordersContainer.appendChild(row);
 
+                row.querySelector('.view-order-btn')
+                    .addEventListener('click', function () {
+
+                        const orderId =
+                            parseInt(this.dataset.id);
+
+                        viewOrderDetails(orderId);
+
+                    });
+
             });
 
         })
@@ -2613,116 +2623,305 @@ function addOrderItemsToInventory(order) {
 }
 
 function viewOrderDetails(orderId) {
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
-    const order = orders.find(o => o.id === orderId);
-    
-    if (!order) {
-        showNotification('Order not found', 'error');
-        return;
-    }
-    
-    let itemsHTML = '';
-    order.items.forEach((item, index) => {
-        itemsHTML += `<tr><td>${index + 1}</td><td>${item.itemName}</td><td>${item.quantity}</td><td>₱${item.price.toFixed(2)}</td><td>₱${item.total.toFixed(2)}</td></tr>`;
-    });
-    
-    let attachmentsHTML = '';
-    if (order.attachments && order.attachments.length > 0) {
-        attachmentsHTML = '<h4>Attachments:</h4><ul style="margin-left: 20px;">';
-        order.attachments.forEach(att => attachmentsHTML += `<li>${att.name} (${att.size})</li>`);
-        attachmentsHTML += '</ul>';
-    } else {
-        attachmentsHTML = '<p style="color: #8d6e63;">No attachments</p>';
-    }
-    
-    const modal = document.getElementById('order-details-modal');
-    const modalContent = modal.querySelector('.modal-content');
-    
-    let deleteButton = (state.currentUser && order.status === 'Cancelled') ? `<button class="action-btn delete" onclick="deletePurchaseOrder(${orderId}, '${order.poNumber}')"><i class="fas fa-trash"></i> Delete Order</button>` : '';
-    
-    let cancelButton = '';
-    if (order.status === 'Pending') {
-        if (state.currentUser.role === 'admin' || state.currentUser.role === 'manager' || 
-            (state.currentUser.role === 'staff' && state.currentUser.username === order.createdBy)) {
-            cancelButton = `<button class="action-btn cancel" onclick="cancelPurchaseOrder(${orderId})"><i class="fas fa-times"></i> Cancel Order</button>`;
+
+    fetch(
+        `api/purchase_orders/read_single.php?id=${orderId}`
+    )
+
+    .then(response => response.json())
+
+    .then(order => {
+
+        let itemsHtml = '';
+
+        if(order.items && order.items.length > 0){
+
+            order.items.forEach(item => {
+
+                itemsHtml += `
+                    <tr>
+                        <td>${item.item_name}</td>
+                        <td>${item.quantity}</td>
+                        <td>₱${parseFloat(item.unit_price).toFixed(2)}</td>
+                        <td>
+                            ₱${(
+                                item.quantity *
+                                item.unit_price
+                            ).toFixed(2)}
+                        </td>
+                    </tr>
+                `;
+
+            });
+
         }
-    }
-    
-    let approveButton = '', shipButton = '', deliverButton = '';
-    if (state.currentUser.role === 'admin' || state.currentUser.role === 'manager') {
-        if (order.status === 'Pending') approveButton = `<button class="action-btn approve" onclick="updateOrderStatus(${orderId}, 'Approved')"><i class="fas fa-check"></i> Approve Order</button>`;
-        if (order.status === 'Approved') shipButton = `<button class="action-btn ship" onclick="updateOrderStatus(${orderId}, 'Shipped')"><i class="fas fa-truck"></i> Mark as Shipped</button>`;
-        if (order.status === 'Shipped') deliverButton = `<button class="action-btn deliver" onclick="updateOrderStatus(${orderId}, 'Delivered')"><i class="fas fa-box"></i> Mark as Delivered</button>`;
-    }
-    
-    const shippingMethod = order.shippingMethod || 'ground';
-    const shippingClass = getShippingBadgeClass(shippingMethod);
-    const shippingDisplay = getShippingMethodName(shippingMethod);
-    const deliveredInfo = order.deliveredAt ? `<p><strong>Delivered On:</strong> ${new Date(order.deliveredAt).toLocaleString()}</p>` : '';
-    
-    modalContent.innerHTML = `
-        <div style="text-align: left;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="color: #5d4037;">Purchase Order Details</h3>
-                <span class="order-status-badge ${getStatusBadgeClass(order.status)}">${order.status}</span>
+
+        const modal =
+            document.createElement('div');
+
+        modal.className =
+            'modal-overlay';
+
+        modal.innerHTML = `
+
+        <div class="modal-content po-modal">
+
+            <h2>
+                Purchase Order Details
+            </h2>
+
+            <hr>
+
+            <p>
+                <strong>PO Number:</strong>
+                ${order.po_number}
+            </p>
+
+            <p>
+                <strong>Supplier:</strong>
+                ${order.supplier_name}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+
+                <span class="
+                    order-status-badge
+                    status-${order.status.toLowerCase()}
+                ">
+                    ${order.status}
+                </span>
+
+            </p>
+
+            <p>
+                <strong>Order Date:</strong>
+                ${order.order_date}
+            </p>
+
+            <p>
+                <strong>Expected Date:</strong>
+                ${order.expected_date}
+            </p>
+
+            <br>
+
+            <table class="inventory-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${itemsHtml}
+
+                </tbody>
+
+            </table>
+
+            <br>
+
+            <h3>
+                Total:
+                ₱${parseFloat(
+                    order.total_amount
+                ).toLocaleString()}
+            </h3>
+
+            <br>
+
+            <div
+                style="
+                    display:flex;
+                    gap:10px;
+                    flex-wrap:wrap;
+                "
+            >
+
+                ${
+                    order.status === 'Pending'
+                    ? `
+                    <button
+                        class="btn btn-success"
+                        onclick="approvePurchaseOrder(${order.id})">
+                        Approve
+                    </button>
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="cancelPurchaseOrder(${order.id})">
+                        Cancel
+                    </button>
+                    `
+                    : ''
+                }
+
+                ${
+                    order.status === 'Approved'
+                    ? `
+                    <button
+                        class="btn btn-primary"
+                        onclick="shipPurchaseOrder(${order.id})">
+                        Ship
+                    </button>
+                    `
+                    : ''
+                }
+
+                ${
+                    order.status === 'Shipped'
+                    ? `
+                    <button
+                        class="btn btn-success"
+                        onclick="deliverPurchaseOrder(${order.id})">
+                        Deliver
+                    </button>
+                    `
+                    : ''
+                }
+
+                <button
+                    class="btn"
+                    id="close-po-modal">
+
+                    Close
+
+                </button>
+
             </div>
-            
-            <div class="order-details-section">
-                <h4>Order Information</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div>
-                        <p><strong>PO Number:</strong> ${order.poNumber}</p>
-                        <p><strong>Reference #:</strong> <span style="color: #d7a35f; font-weight: bold; background: #f9f5f0; padding: 3px 8px; border-radius: 4px;">${order.referenceNumber || 'N/A'}</span></p>
-                        <p><strong>Order Date:</strong> ${order.date}</p>
-                    </div>
-                    <div>
-                        <p><strong>Supplier:</strong> ${order.supplier}</p>
-                        <p><strong>Created By:</strong> ${order.createdBy} (${order.createdByRole || 'staff'})</p>
-                    </div>
-                    <div>
-                        <p><strong>Expected Delivery:</strong> ${order.expectedDate}</p>
-                        <p><strong>Shipping Method:</strong> <span class="shipping-badge ${shippingClass}">${shippingDisplay}</span></p>
-                        <p><strong>Shipping Notes:</strong> ${order.shippingNotes || 'None'}</p>
-                        ${deliveredInfo}
-                    </div>
-                </div>
-            </div>
-            
-            <div class="order-details-section">
-                <h4>Order Items</h4>
-                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                    <thead><tr style="background-color: #8d6e63; color: white;"><th style="padding: 8px;">#</th><th>Item Name</th><th>Quantity</th><th>Unit Price</th><th>Total</th></tr></thead>
-                    <tbody>${itemsHTML}</tbody>
-                    <tfoot><tr style="border-top: 2px solid #d7ccc8;"><td colspan="4" style="padding: 8px; text-align: right; font-weight: bold;">Total Amount:</td><td style="padding: 8px; font-weight: bold;">₱${order.totalAmount.toFixed(2)}</td></tr></tfoot>
-                </table>
-            </div>
-            
-            <div class="order-details-section">
-                <h4>Attachments</h4>
-                ${attachmentsHTML}
-            </div>
-            
-            <div class="order-details-section">
-                <h4>Actions</h4>
-                <div class="order-actions">
-                    <button class="action-btn view" onclick="printOrder(${orderId})"><i class="fas fa-print"></i> Print Order</button>
-                    ${approveButton} ${shipButton} ${deliverButton} ${cancelButton} ${deleteButton}
-                </div>
-            </div>
+
         </div>
-    `;
-    
-    modal.classList.remove('hidden');
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '<i class="fas fa-times"></i> Close';
-    closeBtn.style.cssText = 'position: absolute; top: 15px; right: 15px; padding: 5px 10px; background: none; border: none; color: #8d6e63; cursor: pointer; font-size: 18px;';
-    closeBtn.onclick = () => modal.classList.add('hidden');
-    modalContent.appendChild(closeBtn);
-    
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.classList.add('hidden');
-    };
+        `;
+
+        document.body.appendChild(
+            modal
+        );
+
+        document
+            .getElementById(
+                'close-po-modal'
+            )
+            .addEventListener(
+                'click',
+                () => modal.remove()
+            );
+
+        modal.addEventListener(
+            'click',
+            function(e){
+
+                if(e.target === modal){
+
+                    modal.remove();
+
+                }
+
+            }
+        );
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        showNotification(
+            'Unable to load Purchase Order',
+            'error'
+        );
+
+    });
+
+}
+
+function approvePurchaseOrder(orderId){
+
+    updatePurchaseOrderStatus(
+        orderId,
+        'Approved'
+    );
+
+}
+
+function shipPurchaseOrder(orderId){
+
+    updatePurchaseOrderStatus(
+        orderId,
+        'Shipped'
+    );
+
+}
+
+function deliverPurchaseOrder(orderId){
+
+    updatePurchaseOrderStatus(
+        orderId,
+        'Delivered'
+    );
+
+}
+
+function updatePurchaseOrderStatus(
+    orderId,
+    status
+){
+
+    fetch(
+        'api/purchase_orders/update_status.php',
+        {
+
+            method:'POST',
+
+            headers:{
+                'Content-Type':
+                'application/json'
+            },
+
+            body:JSON.stringify({
+
+                id:orderId,
+                status:status
+
+            })
+
+        }
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if(data.success){
+
+            showNotification(
+                'Purchase Order Updated',
+                'success'
+            );
+
+            loadPurchaseOrders();
+
+            document
+                .querySelectorAll(
+                    '.modal-overlay'
+                )
+                .forEach(
+                    modal => modal.remove()
+                );
+
+        }
+
+    });
+
 }
 
 function clearOrderFilters() {
