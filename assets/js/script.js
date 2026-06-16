@@ -2327,7 +2327,7 @@ function loadPurchaseOrders() {
                     document.createElement('tr');
 
                 row.innerHTML = `
-                    <td>${order.po_number}-${order.reference_no}</td>
+                    <td>${order.reference_no ? `${order.po_number}-${order.reference_no}` : order.po_number}</td>
 
                     <td>${order.supplier_name || '-'}</td>
 
