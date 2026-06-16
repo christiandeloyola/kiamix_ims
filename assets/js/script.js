@@ -2687,7 +2687,7 @@ function viewOrderDetails(orderId) {
 
             <p>
                 <strong>PO Number:</strong>
-                ${order.po_number}
+                ${order.po_number}-${order.reference_no}
             </p>
 
             <p>
