@@ -11,6 +11,7 @@ $query = "
 SELECT
     po.id,
     po.po_number,
+    po.reference_no,
     po.supplier_id,
     po.order_date,
     po.expected_date,
