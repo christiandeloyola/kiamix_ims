@@ -2579,70 +2579,6 @@ function cancelPurchaseOrder(orderId) {
     }
 }
 
-function updateOrderStatus(orderId, newStatus) {
-    if (newStatus === 'Cancelled') {
-        showNotification('Please use the Cancel button to cancel orders', 'error');
-        return;
-    }
-    
-    if (!confirm(`Are you sure you want to change this order's status to "${newStatus}"?`)) return;
-    
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
-    const orderIndex = orders.findIndex(o => o.id === orderId);
-    
-    if (orderIndex === -1) {
-        showNotification('Order not found', 'error');
-        return;
-    }
-    
-    if (state.currentUser.role !== 'admin' && state.currentUser.role !== 'manager') {
-        showNotification('Only administrators and managers can approve, ship, or deliver orders', 'error');
-        return;
-    }
-    
-    const order = orders[orderIndex];
-    const oldStatus = order.status;
-    
-    order.status = newStatus;
-    
-    if (newStatus === 'Delivered' && oldStatus !== 'Delivered') {
-        addOrderItemsToInventory(order);
-        order.deliveredAt = new Date().toISOString();
-        showNotification(`✅ Order ${order.poNumber} delivered. Items added to inventory.`, 'success');
-    }
-    
-    localStorage.setItem('coffeeShopOrders', JSON.stringify(orders));
-    showNotification(`Order ${order.poNumber} status updated from ${oldStatus} to ${newStatus}`, 'success');
-    
-    loadPurchaseOrders();
-    updateDashboardStats();
-    loadRecentItems();
-    loadInventoryItems();
-    
-    const modal = document.getElementById('order-details-modal');
-    if (modal) modal.classList.add('hidden');
-}
-
-function addOrderItemsToInventory(order) {
-    const items = JSON.parse(localStorage.getItem('coffeeShopInventory') || '[]');
-    
-    order.items.forEach(orderItem => {
-        const itemIndex = items.findIndex(item => item.id === orderItem.itemId);
-        if (itemIndex !== -1) {
-            items[itemIndex].quantity += orderItem.quantity;
-            if (items[itemIndex].quantity <= 0) items[itemIndex].status = 'out-of-stock';
-            else if (items[itemIndex].quantity < (items[itemIndex].minQuantity || 5)) items[itemIndex].status = 'low-stock';
-            else items[itemIndex].status = 'in-stock';
-            console.log(`✅ Added ${orderItem.quantity} of ${items[itemIndex].name} to inventory. New quantity: ${items[itemIndex].quantity}`);
-        } else {
-            console.warn(`⚠️ Item ID ${orderItem.itemId} not found in inventory`);
-        }
-    });
-    
-    localStorage.setItem('coffeeShopInventory', JSON.stringify(items));
-    updateInventoryCache();
-}
-
 function viewOrderDetails(orderId) {
 
     fetch(
@@ -2918,6 +2854,11 @@ function updatePurchaseOrderStatus(
     orderId,
     status
 ){
+
+    console.log("Updating PO:", {
+        id: orderId,
+        status: status
+    });
 
     fetch(
         'api/purchase_orders/update_status.php',
