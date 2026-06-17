@@ -1128,7 +1128,6 @@ async function loadSuppliersForDropdowns() {
 
         const suppliers = await response.json();
         supplierData = suppliers;
-        console.log('Suppliers API:', suppliers);
 
         const itemSupplierSelect =
             document.getElementById('item-supplier');
@@ -1145,7 +1144,6 @@ async function loadSuppliersForDropdowns() {
                 '<option value="">Select a supplier</option>';
 
             suppliers.forEach(supplier => {
-                console.log('Supplier:', supplier);
 
                 const option =
                     document.createElement('option');
