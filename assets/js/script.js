@@ -4553,79 +4553,29 @@ function loadReorderItems(reorderItems) {
 
 function exportReport() {
 
-    fetch('api/reports/dashboard.php')
+    const choice = prompt(
+        "Enter:\nPDF = PDF Report\nCSV = CSV Report"
+    );
 
-    .then(response => response.json())
+    if (!choice) return;
 
-    .then(data => {
+    if (choice.toUpperCase() === "PDF") {
 
-        let csvContent = "data:text/csv;charset=utf-8,";
-
-        csvContent += "KiAMiX CoffeeBar Inventory Report\n";
-        csvContent += "Generated," + new Date().toLocaleString() + "\n\n";
-
-        csvContent += "SUMMARY\n";
-        csvContent += "Total Items," + data.total_items + "\n";
-        csvContent += "Total Stock Value,₱" + Number(data.total_value).toFixed(2) + "\n";
-        csvContent += "Items Moved," + data.movement_items + "\n";
-        csvContent += "Low Stock Items," + data.low_stock + "\n\n";
-
-        csvContent += "TOP ITEMS BY VALUE\n";
-        csvContent += "Item Name,Category,Quantity,Unit Price,Total Value\n";
-
-        data.top_items.forEach(item => {
-
-            csvContent +=
-                `${item.item_name},${item.category},${item.quantity},${item.unit_price},${item.total_value}\n`;
-
-        });
-
-        csvContent += "\nREORDER ITEMS\n";
-        csvContent += "Item Name,Current Stock,Minimum Stock,Reorder Amount\n";
-
-        data.reorder_items.forEach(item => {
-
-            csvContent +=
-                `${item.item_name},${item.quantity},${item.min_stock},${item.reorder_amount}\n`;
-
-        });
-
-        const encodedUri = encodeURI(csvContent);
-
-        const link = document.createElement('a');
-
-        link.setAttribute('href', encodedUri);
-
-        link.setAttribute(
-            'download',
-            'inventory_report_' +
-            new Date().toISOString().split('T')[0] +
-            '.csv'
+        window.open(
+            "api/reports/export_inventory_pdf.php",
+            "_blank"
         );
 
-        document.body.appendChild(link);
+    } else if (choice.toUpperCase() === "CSV") {
 
-        link.click();
+        window.location.href =
+            "api/reports/export_inventory_csv.php";
 
-        document.body.removeChild(link);
+    } else {
 
-        showNotification(
-            'Report exported successfully!',
-            'success'
-        );
+        alert("Please enter PDF or CSV");
 
-    })
-
-    .catch(error => {
-
-        console.error(error);
-
-        showNotification(
-            'Failed to export report',
-            'error'
-        );
-
-    });
+    }
 
 }
 
