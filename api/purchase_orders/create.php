@@ -39,8 +39,6 @@ try {
 
     $po_number = "PO" . str_pad($nextPO['next_po'], 3, "0", STR_PAD_LEFT);
 
-    $stmt = $db->prepare($query);
-
     $total_amount = 0;
 
     foreach($data->items as $item){
