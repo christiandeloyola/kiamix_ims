@@ -87,7 +87,11 @@ $stmt->bindParam(
     $data->description
 );
 
-if($stmt->execute()){
+$result = $stmt->execute();
+
+var_dump($result);
+
+if($result){
 
     try {
 
