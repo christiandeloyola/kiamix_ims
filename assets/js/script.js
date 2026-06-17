@@ -2366,7 +2366,10 @@ function loadPurchaseOrders() {
                     </td>
 
                     <td>
-                        ${order.shipping_method || 'Ground'}
+                        ${order.shipping_method
+                            ? order.shipping_method.charAt(0).toUpperCase() +
+                              order.shipping_method.slice(1).toLowerCase()
+                            : 'Ground'}
                     </td>
 
                     <td>
