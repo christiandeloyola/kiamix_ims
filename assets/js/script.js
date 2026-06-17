@@ -1701,7 +1701,7 @@ async function loadInventoryForPOBySupplier(supplierId) {
         const currentValue = select.value;
         select.innerHTML = '<option value="">Select an item</option>';
         items.forEach(item => {
-            console.log('PO Item:', item);
+            // console.log('PO Item:', item);
             const option = document.createElement('option');
 
             option.value = item.id;
