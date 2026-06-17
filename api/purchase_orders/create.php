@@ -39,8 +39,6 @@ try {
 
     $po_number = "PO" . str_pad($nextPO['next_po'], 3, "0", STR_PAD_LEFT);
 
-    die("PO NUMBER = " . $po_number);
-
     $stmt = $db->prepare($query);
 
     $total_amount = 0;
