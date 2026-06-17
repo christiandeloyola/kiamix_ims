@@ -2426,6 +2426,15 @@ function loadPurchaseOrders() {
 
 }
 
+function exportPurchaseOrder(orderId) {
+
+    window.open(
+        `api/reports/export_purchase_order.php?id=${orderId}`,
+        '_blank'
+    );
+
+}
+
 function attachOrderEventListeners() {
     document.querySelectorAll('.view-order-btn').forEach(btn => {
         btn.removeEventListener('click', handleViewOrder);
@@ -2759,6 +2768,12 @@ function viewOrderDetails(orderId) {
                     `
                     : ''
                 }
+
+                <button
+                    class="btn btn-primary"
+                    onclick="exportPurchaseOrder(${order.id})">
+                    Export Receipt
+                </button>
 
                 <button
                     class="btn"
