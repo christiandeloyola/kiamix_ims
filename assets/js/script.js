@@ -4193,6 +4193,11 @@ function generateReport() {
         loadTopItems(data.top_items);
         loadReorderItems(data.reorder_items);
 
+        generateCharts(
+            data.inventory_items || [],
+            category
+        );
+
         showNotification(
             'Report generated successfully',
             'success'
