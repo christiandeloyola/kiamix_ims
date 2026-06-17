@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 header("Content-Type: application/json");
 
 include_once "../../config/database.php";
@@ -27,7 +30,7 @@ try {
 
     $reference_no = time();
 
-    $po_number = $data->po_number;
+    $po_number = $data->po_number ?? null;
 
     $total_amount = 0;
 
