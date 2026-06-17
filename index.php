@@ -521,15 +521,6 @@
                                 </div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-icon orders">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3 id="report-movement-items">0</h3>
-                                    <p>Items Moved This Period</p>
-                                </div>
-                            </div>
-                            <div class="stat-card">
                                 <div class="stat-icon suppliers">
                                     <i class="fas fa-exclamation-triangle"></i>
                                 </div>
@@ -560,34 +551,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <div class="table-container" style="margin-top: 30px;">
-                            <h3 style="padding: 20px 20px 0;">
-                                <i class="fas fa-list-ol"></i> Stock Movement Report
-                            </h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Item Name</th>
-                                        <th>Category</th>
-                                        <th>Starting Stock</th>
-                                        <th>Stock In</th>
-                                        <th>Stock Out</th>
-                                        <th>Current Stock</th>
-                                        <th>Movement %</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="movement-report">
-                                    <tr>
-                                        <td colspan="8" style="text-align: center; padding: 30px; color: #8d6e63;">
-                                            Generate a report to view stock movement data
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        
                         <div class="form-row" style="margin-top: 30px;">
                             <div class="form-container" style="flex: 1;">
                                 <h3 style="margin-bottom: 20px; color: #5d4037;">

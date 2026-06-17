@@ -4183,13 +4183,9 @@ function generateReport() {
         document.getElementById('report-total-value').textContent =
             '₱' + Number(data.total_value).toLocaleString();
 
-        document.getElementById('report-movement-items').textContent =
-            data.movement_items;
-
         document.getElementById('report-low-stock').textContent =
             data.low_stock;
 
-        loadMovementReport(data.movement_report);
         loadTopItems(data.top_items);
         loadReorderItems(data.reorder_items);
 
@@ -4233,11 +4229,6 @@ function updateReportMetrics(items, orders, startDate, endDate) {
         const orderDate = new Date(order.date);
         return orderDate >= startDate && orderDate <= endDate;
     });
-    
-    let itemsMoved = 0;
-    periodOrders.forEach(order => order.items.forEach(item => itemsMoved += item.quantity));
-    const movementItemsEl = document.getElementById('report-movement-items');
-    if (movementItemsEl) movementItemsEl.textContent = itemsMoved;
     
     const lowStockCount = items.filter(item => item.quantity < (item.minQuantity || 5)).length;
     const lowStockEl = document.getElementById('report-low-stock');
@@ -4373,102 +4364,6 @@ function generateCategoryColors(categories) {
     return categories.map(cat =>
         colorMap[cat] || '#cccccc'
     );
-}
-
-function generateMovementReport(items, orders, startDate, endDate) {
-    const movementContainer = document.getElementById('movement-report');
-    if (!movementContainer) return;
-    
-    movementContainer.innerHTML = '';
-    
-    if (items.length === 0) {
-        movementContainer.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: #8d6e63;">No items found for the selected filters</td></tr>';
-        return;
-    }
-    
-    items.forEach(item => {
-        let stockIn = 0;
-        orders.forEach(order => {
-            if (new Date(order.date) >= startDate && new Date(order.date) <= endDate && order.status === 'Delivered') {
-                order.items.forEach(orderItem => {
-                    if (parseInt(orderItem.itemId) === item.id) stockIn += orderItem.quantity;
-                });
-            }
-        });
-        
-        const stockOut = Math.floor(item.quantity * 0.3 * Math.random());
-        const startingStock = item.quantity + stockOut - stockIn;
-        const movementPercent = startingStock > 0 ? ((stockIn - stockOut) / startingStock * 100) : 0;
-        
-        let statusText = '', statusClass = '';
-        if (item.quantity <= 0) {
-            statusText = 'Out of Stock';
-            statusClass = 'status-out-of-stock';
-        } else if (item.quantity < (item.minQuantity || 5)) {
-            statusText = 'Low Stock';
-            statusClass = 'status-low-stock';
-        } else if (movementPercent > 20) {
-            statusText = 'High Movement';
-            statusClass = 'status-in-stock';
-        } else {
-            statusText = 'Normal';
-            statusClass = 'status-in-stock';
-        }
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td><span class="category-tag category-${item.category}">${getCategoryName(item.category)}</span></td>
-            <td>${startingStock.toFixed(2)} ${item.unit}</td>
-            <td>${stockIn.toFixed(2)} ${item.unit}</td>
-            <td>${stockOut.toFixed(2)} ${item.unit}</td>
-            <td>${item.quantity.toFixed(2)} ${item.unit}</td>
-            <td>${movementPercent.toFixed(1)}%</td>
-            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-        `;
-        movementContainer.appendChild(row);
-    });
-}
-
-function loadMovementReport(movementReport) {
-
-    const movementContainer =
-        document.getElementById('movement-report');
-
-    if (!movementContainer) return;
-
-    movementContainer.innerHTML = '';
-
-    if (!movementReport || movementReport.length === 0) {
-
-        movementContainer.innerHTML = `
-            <tr>
-                <td colspan="8"
-                    style="text-align:center;padding:20px;">
-                    No movement data available
-                </td>
-            </tr>
-        `;
-
-        return;
-    }
-
-    movementReport.forEach(item => {
-
-        movementContainer.innerHTML += `
-            <tr>
-                <td>${item.item_name}</td>
-                <td>${item.category}</td>
-                <td>${item.current_stock}</td>
-                <td>${item.stock_in}</td>
-                <td>${item.stock_out}</td>
-                <td>${item.current_stock}</td>
-                <td>-</td>
-                <td>Active</td>
-            </tr>
-        `;
-    });
-
 }
 
 function loadTopItems(topItems) {

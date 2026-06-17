@@ -98,42 +98,6 @@ try {
     $response['reorder_items'] =
         $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // STOCK MOVEMENTS
-
-    $stmt = $pdo->query("
-        SELECT
-        i.item_name,
-        i.category,
-
-        SUM(
-            CASE
-            WHEN sm.movement_type='IN'
-            THEN sm.quantity
-            ELSE 0
-            END
-        ) stock_in,
-
-        SUM(
-            CASE
-            WHEN sm.movement_type='OUT'
-            THEN sm.quantity
-            ELSE 0
-            END
-        ) stock_out,
-
-        i.quantity current_stock
-
-        FROM inventory_items i
-
-        LEFT JOIN stock_movements sm
-        ON i.id = sm.inventory_item_id
-
-        GROUP BY i.id
-    ");
-
-    $response['movement_report'] =
-        $stmt->fetchAll(PDO::FETCH_ASSOC);
-
     // INVENTORY ITEMS FOR REPORT CHARTS
 
     $stmt = $pdo->query("
