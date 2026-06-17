@@ -30,7 +30,14 @@ try {
 
     $reference_no = time();
 
-    $po_number = $data->po_number ?? null;
+    $stmtPO = $db->query("
+        SELECT IFNULL(MAX(id), 0) + 1 AS next_po
+        FROM purchase_orders
+    ");
+
+    $nextPO = $stmtPO->fetch(PDO::FETCH_ASSOC);
+
+    $po_number = "PO" . str_pad($nextPO['next_po'], 3, "0", STR_PAD_LEFT);
 
     $total_amount = 0;
 
