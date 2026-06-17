@@ -4198,7 +4198,8 @@ function generateReport() {
 
         generateCharts(
             data.inventory_items || [],
-            category
+            category,
+            data.monthly_values || []
         );
 
         showNotification(
@@ -4243,7 +4244,7 @@ function updateReportMetrics(items, orders, startDate, endDate) {
     if (lowStockEl) lowStockEl.textContent = lowStockCount;
 }
 
-function generateCharts(items, categoryFilter) {
+function generateCharts(items, categoryFilter, monthlyValues = []) {
     if (window.categoryChart) window.categoryChart.destroy();
     if (window.trendChart) window.trendChart.destroy();
     
@@ -4308,18 +4309,17 @@ function generateCharts(items, categoryFilter) {
         categoryChart.style.display = 'none';
     }
     
-    const trendLabels = [];
-    const trendData = [];
-    const today = new Date();
-    
-    for (let i = 5; i >= 0; i--) {
-        const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
-        const monthName = date.toLocaleString('default', { month: 'short' });
-        trendLabels.push(`${monthName} ${date.getFullYear()}`);
-        const baseValue = categoryFilter === 'all' ? 10000 : 2000;
-        const variation = Math.random() * 0.2 - 0.1;
-        trendData.push(baseValue * (1 + variation));
-    }
+    const trendLabels = monthlyValues.map(
+        item => item.month
+    );
+
+    const trendData = monthlyValues.map(
+        item => Number(item.value)
+    );
+
+    console.log("Monthly Values:", monthlyValues);
+    console.log("Trend Labels:", trendLabels);
+    console.log("Trend Data:", trendData);
     
     const noTrendData = document.getElementById('no-trend-data');
     const trendChart = document.getElementById('trend-chart');
