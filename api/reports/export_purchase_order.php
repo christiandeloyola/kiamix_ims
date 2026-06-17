@@ -201,7 +201,27 @@ width="80"
 
 <p>
 <strong>Status:</strong>
-<?= htmlspecialchars($order['status']) ?>
+<?php
+$statusColor = '#f39c12';
+
+if($order['status'] == 'Delivered'){
+    $statusColor = '#28a745';
+}
+elseif($order['status'] == 'Cancelled'){
+    $statusColor = '#dc3545';
+}
+?>
+
+<span style="
+    background:<?= $statusColor ?>;
+    color:white;
+    padding:4px 10px;
+    border-radius:15px;
+    font-weight:bold;
+    font-size:12px;
+">
+    <?= htmlspecialchars($order['status']) ?>
+</span>
 </p>
 
 <p>
