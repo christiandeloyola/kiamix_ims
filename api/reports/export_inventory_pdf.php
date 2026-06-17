@@ -31,6 +31,8 @@ foreach($items as $item){
 body{
     font-family: Arial, sans-serif;
     padding:20px;
+    max-width:800px;
+    margin:auto;
 }
 
 table{
@@ -38,10 +40,15 @@ table{
     border-collapse:collapse;
 }
 
-th,td{
+th, td{
     border:1px solid #000;
     padding:8px;
     text-align:left;
+}
+
+th{
+    background:#5D4037;
+    color:white;
 }
 
 h1{
@@ -53,8 +60,15 @@ h1{
 </head>
 
 <body>
+<div style="text-align:center;margin-bottom:10px;">
+    <img src="../../assets/images/logo.jpeg"
+         width="90"
+         alt="KiAMiX Logo">
+</div>
 
-<h1>KIAMIX COFFEEBAR INVENTORY REPORT</h1>
+<h1 style="text-align:center;color:#5D4037;margin-top:0;">
+    KIAMIX COFFEEBAR INVENTORY REPORT
+</h1>
 
 <p>
 Generated:
