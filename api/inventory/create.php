@@ -93,12 +93,6 @@ if($result){
 
     try {
 
-        file_put_contents(
-            "audit_test.txt",
-            "Reached logAction: " . $data->item_name . PHP_EOL,
-            FILE_APPEND
-        );
-
         logAction(
             $db,
             1,
