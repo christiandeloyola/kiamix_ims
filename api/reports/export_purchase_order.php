@@ -85,12 +85,21 @@ Purchase Order Receipt
 
 body{
     font-family: Arial, sans-serif;
-    margin:40px;
+    margin:0;
+    padding:20px;
+    max-width:800px;
+    margin:auto;
+    background:#fff;
 }
 
 .header{
     text-align:center;
     margin-bottom:30px;
+}
+
+.container{
+    max-width:800px;
+    margin:auto;
 }
 
 .header h1{
