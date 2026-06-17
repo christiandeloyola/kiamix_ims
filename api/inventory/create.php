@@ -91,6 +91,10 @@ if($stmt->execute()){
 
     try {
 
+        echo "<pre>";
+        print_r($data);
+        echo "</pre>";
+
         logAction(
             $db,
             1,
