@@ -4216,27 +4216,40 @@ async function generateReport() {
 }
 
 function updateReportMetrics(items, orders, startDate, endDate) {
-    const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-    const totalItemsEl = document.getElementById('report-total-items');
-    if (totalItemsEl) totalItemsEl.textContent = totalItems.toFixed(2);
-    
-    const totalValue = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-    const totalValueEl = document.getElementById('report-total-value');
-    if (totalValueEl) totalValueEl.textContent = `₱${totalValue.toFixed(2)}`;
-    
+    // Total quantity
+    const totalItems = items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+    document.getElementById('report-total-items').textContent = totalItems.toFixed(2);
+
+    // Total value
+    const totalValue = items.reduce((sum, item) => {
+        const qty = parseFloat(item.quantity) || 0;
+        const price = parseFloat(item.unit_price || item.price || 0);
+        return sum + (qty * price);
+    }, 0);
+    document.getElementById('report-total-value').textContent = `₱${totalValue.toFixed(2)}`;
+
+    // Items moved in period
+    let itemsMoved = 0;
     const periodOrders = orders.filter(order => {
         const orderDate = new Date(order.date);
         return orderDate >= startDate && orderDate <= endDate;
     });
-    
-    let itemsMoved = 0;
-    periodOrders.forEach(order => order.items.forEach(item => itemsMoved += item.quantity));
-    const movementItemsEl = document.getElementById('report-movement-items');
-    if (movementItemsEl) movementItemsEl.textContent = itemsMoved;
-    
-    const lowStockCount = items.filter(item => item.quantity < (item.minQuantity || 5)).length;
-    const lowStockEl = document.getElementById('report-low-stock');
-    if (lowStockEl) lowStockEl.textContent = lowStockCount;
+    periodOrders.forEach(order => {
+        if (order.items) {
+            order.items.forEach(item => {
+                itemsMoved += parseFloat(item.quantity) || 0;
+            });
+        }
+    });
+    document.getElementById('report-movement-items').textContent = itemsMoved;
+
+    // Low stock items
+    const lowStockCount = items.filter(item => {
+        const qty = parseFloat(item.quantity) || 0;
+        const min = parseFloat(item.min_stock) || 5;
+        return qty < min;
+    }).length;
+    document.getElementById('report-low-stock').textContent = lowStockCount;
 }
 function refreshReportIfActive() {
     const reportsPage = document.getElementById('reports');
@@ -4244,8 +4257,8 @@ function refreshReportIfActive() {
         generateReport();
     }
 }
-function generateCharts(items, categoryFilter) {
-    // ---- Destroy previous charts if they exist ----
+function generateCharts(items) {
+    // Destroy previous charts
     if (window.categoryChart) {
         window.categoryChart.destroy();
         window.categoryChart = null;
@@ -4271,7 +4284,6 @@ function generateCharts(items, categoryFilter) {
     const categoryChartCanvas = document.getElementById('category-chart');
 
     if (categoryLabels.length > 0 && categoryChartCanvas) {
-        // Hide placeholder, show canvas
         if (noChartData) noChartData.style.display = 'none';
         categoryChartCanvas.style.display = 'block';
 
@@ -4306,12 +4318,11 @@ function generateCharts(items, categoryFilter) {
             }
         });
     } else {
-        // No data: show placeholder, hide canvas
         if (noChartData) noChartData.style.display = 'block';
         if (categoryChartCanvas) categoryChartCanvas.style.display = 'none';
     }
 
-    // ---- Stock Value Trend (simulated for now) ----
+    // ---- Stock Value Trend (simulated but based on actual total stock) ----
     const trendLabels = [];
     const trendData = [];
     const today = new Date();
