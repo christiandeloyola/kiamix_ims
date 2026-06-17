@@ -4,6 +4,8 @@ header("Content-Type: application/json");
 
 include_once "../../config/database.php";
 
+require_once '../logs/audit.php';
+
 $database = new Database();
 
 $db = $database->connect();
@@ -86,6 +88,14 @@ $stmt->bindParam(
 );
 
 if($stmt->execute()){
+
+    logAction(
+        $db,
+        1,
+        'CREATE',
+        'INVENTORY',
+        'Added inventory item: ' . $data->item_name
+    );
 
     echo json_encode([
         "success" => true,
