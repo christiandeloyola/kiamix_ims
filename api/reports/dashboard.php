@@ -148,6 +148,25 @@ try {
     $response['inventory_items'] =
         $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // MONTHLY STOCK VALUE TREND
+
+    $monthlyValues = [];
+
+    for ($i = 5; $i >= 0; $i--) {
+
+        $monthLabel = date(
+            'M Y',
+            strtotime("-$i months")
+        );
+
+        $monthlyValues[] = [
+            'month' => $monthLabel,
+            'value' => (float)$response['total_value']
+        ];
+    }
+
+    $response['monthly_values'] = $monthlyValues;
+
     echo json_encode($response);
 
 } catch(Exception $e){
