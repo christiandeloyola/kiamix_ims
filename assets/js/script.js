@@ -4173,19 +4173,42 @@ function generateReport() {
             break;
     }
     
-    const items = JSON.parse(localStorage.getItem('coffeeShopInventory') || '[]');
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
-    
-    let filteredItems = items;
-    if (category !== 'all') filteredItems = items.filter(item => item.category === category);
-    
-    updateReportMetrics(filteredItems, orders, startDate, endDate);
-    generateCharts(filteredItems, category);
-    generateMovementReport(filteredItems, orders, startDate, endDate);
-    generateTopItemsByValue(filteredItems);
-    generateReorderItems(filteredItems);
-    
-    showNotification('Report generated successfully', 'success');
+    fetch('api/reports/dashboard.php')
+    .then(response => response.json())
+    .then(data => {
+
+        document.getElementById('report-total-items').textContent =
+            data.total_items;
+
+        document.getElementById('report-total-value').textContent =
+            '₱' + Number(data.total_value).toLocaleString();
+
+        document.getElementById('report-movement-items').textContent =
+            data.movement_items;
+
+        document.getElementById('report-low-stock').textContent =
+            data.low_stock;
+
+        loadMovementReport(data.movement_report);
+        loadTopItems(data.top_items);
+        loadReorderItems(data.reorder_items);
+
+        showNotification(
+            'Report generated successfully',
+            'success'
+        );
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        showNotification(
+            'Failed to load report data',
+            'error'
+        );
+
+    });
 }
 
 function updateReportMetrics(items, orders, startDate, endDate) {
@@ -4387,59 +4410,125 @@ function generateMovementReport(items, orders, startDate, endDate) {
     });
 }
 
-function generateTopItemsByValue(items) {
-    const container = document.getElementById('top-items-by-value');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    const sortedItems = [...items].sort((a, b) => (b.quantity * b.price) - (a.quantity * a.price)).slice(0, 5);
-    
-    if (sortedItems.length === 0) {
-        container.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #8d6e63;">No items found</td></tr>';
+function loadMovementReport(movementReport) {
+
+    const movementContainer =
+        document.getElementById('movement-report');
+
+    if (!movementContainer) return;
+
+    movementContainer.innerHTML = '';
+
+    if (!movementReport || movementReport.length === 0) {
+
+        movementContainer.innerHTML = `
+            <tr>
+                <td colspan="8"
+                    style="text-align:center;padding:20px;">
+                    No movement data available
+                </td>
+            </tr>
+        `;
+
         return;
     }
-    
-    sortedItems.forEach(item => {
-        const totalValue = item.quantity * item.price;
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td><span class="category-tag category-${item.category}">${getCategoryName(item.category)}</span></td>
-            <td>${item.quantity.toFixed(2)} ${item.unit}</td>
-            <td>₱${item.price.toFixed(2)}</td>
-            <td>₱${totalValue.toFixed(2)}</td>
+
+    movementReport.forEach(item => {
+
+        movementContainer.innerHTML += `
+            <tr>
+                <td>${item.item_name}</td>
+                <td>${item.category}</td>
+                <td>${item.current_stock}</td>
+                <td>${item.stock_in}</td>
+                <td>${item.stock_out}</td>
+                <td>${item.current_stock}</td>
+                <td>-</td>
+                <td>Active</td>
+            </tr>
         `;
-        container.appendChild(row);
     });
+
 }
 
-function generateReorderItems(items) {
-    const container = document.getElementById('reorder-items');
+function loadTopItems(topItems) {
+
+    const container =
+        document.getElementById('top-items-by-value');
+
     if (!container) return;
-    
+
     container.innerHTML = '';
-    const reorderItems = items.filter(item => item.quantity < (item.minQuantity || 5));
-    
-    if (reorderItems.length === 0) {
-        container.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #8d6e63;">No items need reorder at this time</td></tr>';
+
+    if (!topItems || topItems.length === 0) {
+
+        container.innerHTML = `
+            <tr>
+                <td colspan="5"
+                    style="text-align:center;padding:20px;">
+                    No data available
+                </td>
+            </tr>
+        `;
+
         return;
     }
-    
-    reorderItems.forEach(item => {
-        const reorderAmount = Math.max((item.minQuantity || 5) * 2 - item.quantity, 1);
-        const statusClass = item.quantity <= 0 ? 'status-out-of-stock' : 'status-low-stock';
-        const statusText = item.quantity <= 0 ? 'Out of Stock' : 'Low Stock';
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.quantity.toFixed(2)} ${item.unit}</td>
-            <td>${item.minQuantity || 5} ${item.unit}</td>
-            <td>${reorderAmount.toFixed(2)} ${item.unit}</td>
-            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+
+    topItems.forEach(item => {
+
+        container.innerHTML += `
+            <tr>
+                <td>${item.item_name}</td>
+                <td>${item.category}</td>
+                <td>${item.quantity}</td>
+                <td>₱${Number(item.unit_price).toFixed(2)}</td>
+                <td>₱${Number(item.total_value).toFixed(2)}</td>
+            </tr>
         `;
-        container.appendChild(row);
     });
+
+}
+
+function loadReorderItems(reorderItems) {
+
+    const container =
+        document.getElementById('reorder-items');
+
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    if (!reorderItems || reorderItems.length === 0) {
+
+        container.innerHTML = `
+            <tr>
+                <td colspan="5"
+                    style="text-align:center;padding:20px;">
+                    No items need reorder
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    reorderItems.forEach(item => {
+
+        container.innerHTML += `
+            <tr>
+                <td>${item.item_name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.min_stock}</td>
+                <td>${item.reorder_amount}</td>
+                <td>
+                    <span class="status-badge status-low-stock">
+                        Reorder
+                    </span>
+                </td>
+            </tr>
+        `;
+    });
+
 }
 
 function exportReport() {
