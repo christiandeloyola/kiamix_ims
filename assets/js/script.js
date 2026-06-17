@@ -1691,9 +1691,9 @@ async function loadInventoryForPOBySupplier(supplierId) {
         )
         : [];
 
-    console.log('supplierId:', supplierId);
-    console.log('inventoryItemsCache:', inventoryItemsCache);
-    console.log('filtered items:', items);
+    // console.log('supplierId:', supplierId);
+    // console.log('inventoryItemsCache:', inventoryItemsCache);
+    // console.log('filtered items:', items);
 
     const selectElements = document.querySelectorAll('.po-item-select');
     
