@@ -157,9 +157,13 @@ src="../../assets/images/logo.jpeg"
 width="80"
 >
 
-<h1>KiAMiX CoffeeBar</h1>
+<h1 style="margin:5px 0;color:#5D4037;">
+    KiAMiX CoffeeBar
+</h1>
 
-<h3>Purchase Order Receipt</h3>
+<h2 style="margin:0;">
+    PURCHASE ORDER RECEIPT
+</h2>
 
 </div>
 
