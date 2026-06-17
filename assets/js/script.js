@@ -4193,6 +4193,9 @@ function generateReport() {
         loadTopItems(data.top_items);
         loadReorderItems(data.reorder_items);
 
+        console.log("Dashboard Data:", data);
+        console.log("Inventory Items:", data.inventory_items);
+
         generateCharts(
             data.inventory_items || [],
             category
