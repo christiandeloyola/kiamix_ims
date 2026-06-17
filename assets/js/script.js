@@ -4253,8 +4253,13 @@ function generateCharts(items, categoryFilter) {
         categories[item.category] += item.quantity * item.price;
     });
     
-    const categoryLabels = Object.keys(categories).map(key => getCategoryName(key));
+    const categoryLabels = Object.keys(categories);
     const categoryValues = Object.values(categories);
+
+    console.log("Categories Object:", categories);
+    console.log("Category Labels:", categoryLabels);
+    console.log("Category Values:", categoryValues);
+
     const categoryColors = generateCategoryColors(Object.keys(categories));
     
     const noChartData = document.getElementById('no-chart-data');
@@ -4265,6 +4270,9 @@ function generateCharts(items, categoryFilter) {
         categoryChart.style.display = 'block';
         
         const ctx = categoryChart.getContext('2d');
+
+        console.log("Creating Pie Chart...");
+
         window.categoryChart = new Chart(ctx, {
             type: 'pie',
             data: {
