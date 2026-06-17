@@ -89,13 +89,21 @@ $stmt->bindParam(
 
 if($stmt->execute()){
 
-    logAction(
-        $db,
-        1,
-        'CREATE',
-        'INVENTORY',
-        'Added inventory item: ' . $data->item_name
-    );
+    try {
+
+        logAction(
+            $db,
+            1,
+            'CREATE',
+            'INVENTORY',
+            'Added inventory item: ' . $data->item_name
+        );
+
+    } catch(Exception $e) {
+
+        error_log($e->getMessage());
+
+    }
 
     echo json_encode([
         "success" => true,
