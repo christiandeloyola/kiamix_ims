@@ -32,6 +32,13 @@ $stmt = $db->prepare($query);
 
 $stmt->execute();
 
-echo json_encode(
-    $stmt->fetchAll(PDO::FETCH_ASSOC)
-);
+$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($orders as &$order) {
+
+    $order['shipping_method'] =
+        ucfirst(strtolower($order['shipping_method']));
+
+}
+
+echo json_encode($orders);
