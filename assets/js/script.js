@@ -4177,7 +4177,7 @@ async function generateReport() {
             endDate = new Date(today);
     }
 
-    // ---- Fetch inventory from API (NEW) ----
+    // ---- Fetch inventory from API ----
     let items = [];
     try {
         const response = await fetch(INVENTORY_API + '/read.php');
@@ -4188,10 +4188,19 @@ async function generateReport() {
         return;
     }
 
+    // ---- Map API fields to the names expected by helper functions ----
+    items = items.map(item => ({
+        ...item,
+        price: item.unit_price,          // price alias
+        name: item.item_name,            // name alias
+        minQuantity: item.min_stock,     // minQuantity alias
+        category: item.category          // keep category as is
+    }));
+
     // ---- Orders (still from localStorage for now) ----
     const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
 
-    // ---- Apply category filter (if needed) ----
+    // ---- Apply category filter ----
     let filteredItems = items;
     if (category !== 'all') {
         filteredItems = items.filter(item => item.category === category);
@@ -4230,7 +4239,12 @@ function updateReportMetrics(items, orders, startDate, endDate) {
     const lowStockEl = document.getElementById('report-low-stock');
     if (lowStockEl) lowStockEl.textContent = lowStockCount;
 }
-
+function refreshReportIfActive() {
+    const reportsPage = document.getElementById('reports');
+    if (reportsPage && reportsPage.classList.contains('active')) {
+        generateReport();
+    }
+}
 function generateCharts(items, categoryFilter) {
     if (window.categoryChart) window.categoryChart.destroy();
     if (window.trendChart) window.trendChart.destroy();
