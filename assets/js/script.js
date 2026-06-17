@@ -4260,7 +4260,8 @@ function generateCharts(items, categoryFilter) {
     console.log("Category Labels:", categoryLabels);
     console.log("Category Values:", categoryValues);
 
-    const categoryColors = generateCategoryColors(Object.keys(categories));
+    const categoryColors =
+        generateCategoryColors(Object.keys(categories));
     
     const noChartData = document.getElementById('no-chart-data');
     const categoryChart = document.getElementById('category-chart');
@@ -4359,16 +4360,19 @@ function generateCharts(items, categoryFilter) {
 
 function generateCategoryColors(categories) {
     const colorMap = {
-        'coffee': '#ffb74d',
-        'tea': '#81c784',
-        'pastry': '#ffd54f',
-        'syrup': '#ba68c8',
-        'milk': '#64b5f6',
-        'cup': '#a1887f',
-        'cleaning': '#e57373',
-        'equipment': '#90a4ae'
+        'Coffee Beans': '#8d6e63',
+        'Milk & Dairy': '#4caf50',
+        'Tea': '#81c784',
+        'Pastry': '#ffd54f',
+        'Syrup': '#ba68c8',
+        'Cups': '#64b5f6',
+        'Cleaning Supplies': '#e57373',
+        'Equipment': '#90a4ae'
     };
-    return categories.map(cat => colorMap[cat] || '#cccccc');
+
+    return categories.map(cat =>
+        colorMap[cat] || '#cccccc'
+    );
 }
 
 function generateMovementReport(items, orders, startDate, endDate) {
