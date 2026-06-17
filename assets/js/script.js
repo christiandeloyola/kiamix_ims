@@ -4136,12 +4136,11 @@ function initializeReports() {
     if (startDateInput) startDateInput.value = firstDay.toISOString().split('T')[0];
     if (endDateInput) endDateInput.value = today.toISOString().split('T')[0];
 }
-
 async function generateReport() {
     const period = document.getElementById('report-period')?.value || 'week';
     const category = document.getElementById('report-category')?.value || 'all';
 
-    // ---- Date range calculation (unchanged) ----
+    // ---- Date range calculation ----
     let startDate, endDate;
     const today = new Date();
     switch(period) {
@@ -4188,16 +4187,15 @@ async function generateReport() {
         return;
     }
 
-    // ---- Map API fields to the names expected by helper functions ----
+    // ---- Map API fields to expected names ----
     items = items.map(item => ({
         ...item,
-        price: item.unit_price,          // price alias
-        name: item.item_name,            // name alias
-        minQuantity: item.min_stock,     // minQuantity alias
-        category: item.category          // keep category as is
+        price: item.unit_price,
+        name: item.item_name,
+        minQuantity: item.min_stock
     }));
 
-    // ---- Orders (still from localStorage for now) ----
+    // ---- Orders (still from localStorage, can be replaced later) ----
     const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
 
     // ---- Apply category filter ----
@@ -4206,14 +4204,15 @@ async function generateReport() {
         filteredItems = items.filter(item => item.category === category);
     }
 
-    // ---- Update metrics and charts ----
+    // ---- Update all report sections ----
     updateReportMetrics(filteredItems, orders, startDate, endDate);
     generateCharts(filteredItems, category);
     generateMovementReport(filteredItems, orders, startDate, endDate);
     generateTopItemsByValue(filteredItems);
     generateReorderItems(filteredItems);
 
-    showNotification('Report generated successfully', 'success');
+    // (Optional) show notification only when manually triggered
+    // showNotification('Report generated successfully', 'success');
 }
 
 function updateReportMetrics(items, orders, startDate, endDate) {
@@ -4246,27 +4245,37 @@ function refreshReportIfActive() {
     }
 }
 function generateCharts(items, categoryFilter) {
-    if (window.categoryChart) window.categoryChart.destroy();
-    if (window.trendChart) window.trendChart.destroy();
-    
+    // ---- Destroy previous charts if they exist ----
+    if (window.categoryChart) {
+        window.categoryChart.destroy();
+        window.categoryChart = null;
+    }
+    if (window.trendChart) {
+        window.trendChart.destroy();
+        window.trendChart = null;
+    }
+
+    // ---- Stock Distribution by Category ----
     const categories = {};
     items.forEach(item => {
-        if (!categories[item.category]) categories[item.category] = 0;
-        categories[item.category] += item.quantity * item.price;
+        const cat = item.category || 'Uncategorized';
+        if (!categories[cat]) categories[cat] = 0;
+        categories[cat] += parseFloat(item.quantity) || 0;
     });
-    
-    const categoryLabels = Object.keys(categories).map(key => getCategoryName(key));
+
+    const categoryLabels = Object.keys(categories);
     const categoryValues = Object.values(categories);
-    const categoryColors = generateCategoryColors(Object.keys(categories));
-    
+    const categoryColors = generateCategoryColors(categoryLabels);
+
     const noChartData = document.getElementById('no-chart-data');
-    const categoryChart = document.getElementById('category-chart');
-    
-    if (categoryLabels.length > 0 && noChartData && categoryChart) {
-        noChartData.style.display = 'none';
-        categoryChart.style.display = 'block';
-        
-        const ctx = categoryChart.getContext('2d');
+    const categoryChartCanvas = document.getElementById('category-chart');
+
+    if (categoryLabels.length > 0 && categoryChartCanvas) {
+        // Hide placeholder, show canvas
+        if (noChartData) noChartData.style.display = 'none';
+        categoryChartCanvas.style.display = 'block';
+
+        const ctx = categoryChartCanvas.getContext('2d');
         window.categoryChart = new Chart(ctx, {
             type: 'pie',
             data: {
@@ -4289,18 +4298,80 @@ function generateCharts(items, categoryFilter) {
                                 const value = context.raw;
                                 const total = categoryValues.reduce((a, b) => a + b, 0);
                                 const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-                                return `₱${value.toFixed(2)} (${percentage}%)`;
+                                return `${value.toFixed(0)} units (${percentage}%)`;
                             }
                         }
                     }
                 }
             }
         });
-    } else if (noChartData && categoryChart) {
-        noChartData.style.display = 'block';
-        categoryChart.style.display = 'none';
+    } else {
+        // No data: show placeholder, hide canvas
+        if (noChartData) noChartData.style.display = 'block';
+        if (categoryChartCanvas) categoryChartCanvas.style.display = 'none';
     }
-    
+
+    // ---- Stock Value Trend (simulated for now) ----
+    const trendLabels = [];
+    const trendData = [];
+    const today = new Date();
+    const totalStock = items.reduce((sum, item) => sum + (parseFloat(item.quantity) || 0), 0);
+
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        const monthName = date.toLocaleString('default', { month: 'short' });
+        trendLabels.push(`${monthName} ${date.getFullYear()}`);
+        const variation = (Math.random() * 0.2 - 0.1) * totalStock;
+        trendData.push(Math.max(0, totalStock + variation));
+    }
+
+    const noTrendData = document.getElementById('no-trend-data');
+    const trendChartCanvas = document.getElementById('trend-chart');
+
+    if (trendChartCanvas) {
+        if (noTrendData) noTrendData.style.display = 'none';
+        trendChartCanvas.style.display = 'block';
+
+        const trendCtx = trendChartCanvas.getContext('2d');
+        window.trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: trendLabels,
+                datasets: [{
+                    label: 'Total Stock Quantity Trend',
+                    data: trendData,
+                    borderColor: '#8d6e63',
+                    backgroundColor: 'rgba(141, 110, 99, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.raw.toFixed(0)} units`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { callback: value => value.toFixed(0) + ' units' }
+                    }
+                }
+            }
+        });
+    } else {
+        if (noTrendData) noTrendData.style.display = 'block';
+    }
+}
     const trendLabels = [];
     const trendData = [];
     const today = new Date();
@@ -4348,6 +4419,12 @@ function generateCharts(items, categoryFilter) {
                 }
             }
         });
+    }
+
+    function refreshReportIfActive() {
+    const reportsPage = document.getElementById('reports');
+    if (reportsPage && reportsPage.classList.contains('active')) {
+        generateReport();
     }
 }
 
