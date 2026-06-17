@@ -89,15 +89,15 @@ $stmt->bindParam(
 
 $result = $stmt->execute();
 
-var_dump($result);
-
 if($result){
 
     try {
 
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
+        file_put_contents(
+            "audit_test.txt",
+            "Reached logAction: " . $data->item_name . PHP_EOL,
+            FILE_APPEND
+        );
 
         logAction(
             $db,
