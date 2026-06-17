@@ -45,6 +45,40 @@ $stmt->bindParam(
 );
 
 if ($stmt->execute()) {
+    if ($data->status === 'Delivered') {
+
+        $itemsQuery = "
+            SELECT
+                inventory_item_id,
+                quantity
+            FROM purchase_order_items
+            WHERE purchase_order_id = :purchase_order_id
+        ";
+
+        $itemsStmt = $db->prepare($itemsQuery);
+
+        $itemsStmt->execute([
+            ':purchase_order_id' => $data->id
+        ]);
+
+        $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($items as $item) {
+
+            $updateInventory = "
+                UPDATE inventory_items
+                SET quantity = quantity + :qty
+                WHERE id = :inventory_item_id
+            ";
+
+            $inventoryStmt = $db->prepare($updateInventory);
+
+            $inventoryStmt->execute([
+                ':qty' => $item['quantity'],
+                ':inventory_item_id' => $item['inventory_item_id']
+            ]);
+        }
+    }
 
     echo json_encode([
         "success" => true,
