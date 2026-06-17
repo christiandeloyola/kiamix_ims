@@ -139,9 +139,14 @@ table th{
 
 </head>
 
-<body>
+<body onload="window.print()">
 
 <div class="header">
+
+<img
+src="../../assets/images/logo.jpeg"
+width="80"
+>
 
 <h1>KiAMiX CoffeeBar</h1>
 
