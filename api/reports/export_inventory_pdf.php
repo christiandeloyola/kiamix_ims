@@ -70,11 +70,6 @@ h1{
     KIAMIX COFFEEBAR INVENTORY REPORT
 </h1>
 
-<p>
-Generated:
-<?= date('F d, Y h:i A'); ?>
-</p>
-
 <table>
 
     <tr>

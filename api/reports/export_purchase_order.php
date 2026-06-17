@@ -165,11 +165,6 @@ width="80"
     PURCHASE ORDER RECEIPT
 </h2>
 
-<p>
-    Generated:
-    <?= date('F d, Y h:i A') ?>
-</p>
-
 </div>
 
 <div class="info">
