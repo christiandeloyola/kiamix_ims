@@ -134,6 +134,20 @@ try {
     $response['movement_report'] =
         $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // INVENTORY ITEMS FOR REPORT CHARTS
+
+    $stmt = $pdo->query("
+        SELECT
+            item_name,
+            category,
+            quantity,
+            unit_price AS price
+        FROM inventory_items
+    ");
+
+    $response['inventory_items'] =
+        $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     echo json_encode($response);
 
 } catch(Exception $e){
