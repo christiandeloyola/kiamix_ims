@@ -1629,53 +1629,17 @@ function getCategoryName(category) {
     return categoryNames[category] || category;
 }
 
-function getCategoryBadge(category){
-
-    let className = '';
-
-    switch(category){
-
-        case 'Coffee Beans':
-            className = 'category-coffee';
-            break;
-
-        case 'Tea & Herbal':
-            className = 'category-tea';
-            break;
-
-        case 'Pastries & Food':
-            className = 'category-pastry';
-            break;
-
-        case 'Syrups & Flavorings':
-            className = 'category-syrup';
-            break;
-
-        case 'Milk & Dairy':
-            className = 'category-milk';
-            break;
-
-        case 'Cups & Packaging':
-            className = 'category-cups';
-            break;
-
-        case 'Cleaning Supplies':
-            className = 'category-cleaning';
-            break;
-
-        case 'Equipment':
-            className = 'category-equipment';
-            break;
-
-        default:
-            className = 'category-coffee';
+function getCategoryBadge(category) {
+    // Generate a consistent color from the category name
+    let hash = 0;
+    for (let i = 0; i < category.length; i++) {
+        hash = category.charCodeAt(i) + ((hash << 5) - hash);
     }
+    const hue = Math.abs(hash) % 360;
+    const bgColor = `hsl(${hue}, 70%, 85%)`;
+    const textColor = `hsl(${hue}, 70%, 25%)`;
 
-    return `
-        <span class="category-badge ${className}">
-            ${category}
-        </span>
-    `;
+    return `<span class="category-badge" style="background: ${bgColor}; color: ${textColor};">${category}</span>`;
 }
 
 // ============================================
