@@ -371,10 +371,10 @@
                                     <label for="po-shipping-method">Shipping Method</label>
                                     <select id="po-shipping-method">
                                         <option value="">Select Shipping Method</option>
-                                        <option value="ground">Standard Shipping</option>
-                                        <option value="express">Express Delivery</option>
-                                        <option value="pickup">Supplier Pickup</option>
-                                        <option value="local">Local Delivery</option>
+                                        <option value="Ground">Standard Shipping</option>
+                                        <option value="Express">Express Delivery</option>
+                                        <option value="Pickup">Supplier Pickup</option>
+                                        <option value="Local">Local Delivery</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
