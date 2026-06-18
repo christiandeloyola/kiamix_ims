@@ -652,6 +652,7 @@ function showPage(pageId) {
             }
 
             loadUsers();
+            loadActiveSessions();
         }
         } else if (pageId === 'suppliers') {
             loadSuppliers();
@@ -3081,6 +3082,70 @@ async function loadUsers() {
     }
 }
 
+async function loadActiveSessions() {
+
+    const tbody =
+        document.getElementById(
+            'active-sessions'
+        );
+
+    if (!tbody) return;
+
+    try {
+
+        const response =
+            await fetch(
+                'api/users/active_sessions.php'
+            );
+
+        const result =
+            await response.json();
+
+        tbody.innerHTML = '';
+
+        if (
+            !result.success ||
+            result.data.length === 0
+        ) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        No active sessions
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        result.data.forEach(session => {
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${session.username}</td>
+                    <td>${session.fullname}</td>
+                    <td>${session.role}</td>
+                    <td>${session.login_time}</td>
+                    <td>
+                        <span style="color:green">
+                            Online
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch(error) {
+
+        console.error(
+            'Active Sessions Error:',
+            error
+        );
+
+    }
+}
+
 async function viewUserProfile(username) {
     const users = await getUsers();
     const user = users.find(u => u.username === username);
@@ -3090,16 +3155,6 @@ async function viewUserProfile(username) {
     }
     
     const isCurrentUser = state.currentUser && state.currentUser.username === username;
-
-    const activeSessions =
-        JSON.parse(
-            localStorage.getItem('activeSessions') || '[]'
-        );
-
-    const isActive =
-        activeSessions.some(
-            session => session.username === username
-        );
     
     const profileHTML = `
         <div style="text-align: left; padding: 20px;">
