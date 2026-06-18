@@ -557,7 +557,7 @@ function showApp() {
     if (settingsMenu) {
 
         settingsMenu.style.display =
-            role === 'admin'
+            role === 'Administrator'
                 ? 'block'
                 : 'none';
 
@@ -3019,60 +3019,87 @@ function loadActiveSessions() {
 }
 
 async function loadUsers() {
-    const users = await getUsers();
-    const usersContainer = document.getElementById('users-list');
-    if (!usersContainer) return;
-    
-    usersContainer.innerHTML = '';
-    
-    if (users.length === 0) {
-        usersContainer.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #8d6e63;">No users found</td></tr>';
-        return;
+
+    try {
+
+        const response =
+            await fetch('api/users/read.php');
+
+        const result =
+            await response.json();
+
+        console.log(result);
+
+        const usersContainer =
+            document.getElementById('users-list');
+
+        if (!usersContainer) return;
+
+        usersContainer.innerHTML = '';
+
+        if (!result.success) {
+
+            usersContainer.innerHTML =
+            `<tr>
+                <td colspan="6">
+                    Failed to load users
+                </td>
+            </tr>`;
+
+            return;
+        }
+
+        result.data.forEach(user => {
+
+            const row =
+                document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.fullname}</td>
+                <td>${user.email}</td>
+                <td>${user.role}</td>
+                <td>${user.created_at}</td>
+                <td>
+                    <button
+                        class="action-btn view"
+                        data-username="${user.username}">
+                        View Profile
+                    </button>
+
+                    <button
+                    class="action-btn edit"
+                    data-username="${user.username}">
+                    Edit
+                    </button>
+                </td>
+            `;
+
+            usersContainer.appendChild(row);
+            row.querySelector('.view')
+                ?.addEventListener('click', function () {
+
+                    const username =
+                        this.getAttribute('data-username');
+
+                    viewUserProfile(username);
+                });
+
+            row.querySelector('.edit')
+                ?.addEventListener('click', function () {
+
+                    const username =
+                        this.getAttribute('data-username');
+
+                    editUserAccount(username);
+                });
+
+        });
+
+    } catch(error) {
+
+        console.error(error);
     }
-    
-    users.forEach(user => {
-        const isCurrentUser = state.currentUser && state.currentUser.username === user.username;
-        const activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-        const isActive = activeSessions.some(session => session.username === user.username);
-        const accountCreated = new Date();
-        accountCreated.setDate(accountCreated.getDate() - Math.floor(Math.random() * 30));
-        
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${user.username} ${isActive ? '<span style="color: #4caf50; font-size: 12px;">(Online)</span>' : ''} ${isCurrentUser ? '<span style="color: #ffb74d; font-size: 12px;">(You)</span>' : ''}</td>
-            <td>${user.fullname}</td>
-            <td>${user.email}</td>
-            <td>${user.role}</td>
-            <td>${accountCreated.toLocaleDateString()}</td>
-            <td class="action-btns">
-                <button class="action-btn view" data-username="${user.username}">View Profile</button>
-                <button class="action-btn edit" data-username="${user.username}">Edit</button>
-                ${state.currentUser && state.currentUser.role === 'Administrator' && user.username !== 'Administrator' && !isCurrentUser ? `<button class="action-btn delete" data-username="${user.username}">Delete</button>` : ''}
-            </td>
-        `;
-        usersContainer.appendChild(row);
-    });
-    
-    document.querySelectorAll('#users-list .action-btn.view').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const username = this.getAttribute('data-username');
-            viewUserProfile(username);
-        });
-    });
-    
-    document.querySelectorAll('#users-list .action-btn.edit').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const username = this.getAttribute('data-username');
-            editUserAccount(username);
-        });
-    });
-    
-    document.querySelectorAll('#users-list .action-btn.delete').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const username = this.getAttribute('data-username');
-            deleteUserAccount(username);
-        });
-    });
 }
 
 async function viewUserProfile(username) {
@@ -3129,6 +3156,10 @@ async function editUserAccount(username) {
         return;
     }
     
+    console.log('Current User:', state.currentUser);
+    console.log('Current Role:', state.currentUser.role);
+    console.log('Editing User:', username);
+
     if (state.currentUser.role !== 'Administrator' && state.currentUser.username !== username) {
         showNotification('You can only edit your own account. Only administrators can edit other users.', 'error');
         return;
@@ -3151,10 +3182,25 @@ async function editUserAccount(username) {
                 ${state.currentUser.role === 'Administrator' ? `
                     <div class="form-group">
                         <label for="edit-role"><strong>Role</strong></label>
-                        <select id="edit-role" style="width: 100%; padding: 8px; margin-top: 5px;" ${isCurrentUser ? 'disabled' : ''}>
-                            <option value="staff" ${user.role === 'staff' ? 'selected' : ''}>Staff Member</option>
-                            <option value="manager" ${user.role === 'manager' ? 'selected' : ''}>Store Manager</option>
-                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Administrator</option>
+                        <select id="edit-role"
+                            style="width:100%; padding:8px; margin-top:5px;"
+                            ${isCurrentUser ? 'disabled' : ''}>
+
+                            <option value="Staff"
+                                ${user.role === 'Staff' ? 'selected' : ''}>
+                                Staff Member
+                            </option>
+
+                            <option value="Store Manager"
+                                ${user.role === 'Store Manager' ? 'selected' : ''}>
+                                Store Manager
+                            </option>
+
+                            <option value="Administrator"
+                                ${user.role === 'Administrator' ? 'selected' : ''}>
+                                Administrator
+                            </option>
+
                         </select>
                         ${isCurrentUser ? '<p style="color: #8d6e63; font-size: 12px; margin-top: 5px;">You cannot change your own role</p>' : ''}
                     </div>
