@@ -8,6 +8,48 @@ const state = {
     currentPage: 'dashboard'
 };
 
+async function getUsers() {
+
+    const response = await fetch(
+        'api/users/read.php'
+    );
+
+    const result = await response.json();
+
+    return result.data || [];
+}
+
+async function createUser(userData) {
+
+    const response = await fetch(
+        'api/users/create.php',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        }
+    );
+
+    return await response.json();
+}
+
+async function loginUser(usernameOrEmail, password, role) {
+
+    const users = await getUsers();
+
+    return users.find(u =>
+        (u.username === usernameOrEmail ||
+         u.email === usernameOrEmail) &&
+        u.password === password &&
+        u.role === role
+    );
+}
+
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+
 function getCurrentRole() {
 
     return state.currentUser?.role || '';
@@ -98,15 +140,6 @@ function migrateExistingOrders() {
 // INITIALIZATION FUNCTIONS
 // ============================================
 function initializeData() {
-    if (!localStorage.getItem('coffeeShopUsers')) {
-        const defaultUsers = [
-            { username: 'admin', password: 'admin123', name: 'Administrator', email: 'admin@kiamix.com', role: 'admin' },
-            { username: 'manager', password: 'manager123', name: 'Store Manager', email: 'manager@kiamix.com', role: 'manager' },
-            { username: 'staff', password: 'staff123', name: 'Staff Member', email: 'staff@kiamix.com', role: 'staff' }
-        ];
-        localStorage.setItem('coffeeShopUsers', JSON.stringify(defaultUsers));
-    }
-
     if (!localStorage.getItem('coffeeShopInventory')) {
         const defaultItems = [
             { id: 1, name: 'Arabica Coffee Beans', category: 'coffee', quantity: 25, unit: 'kg', price: 950.99, supplier: 'Coffee Supply Co.', minQuantity: 5, status: 'in-stock', description: 'Premium Arabica beans from Colombia' },
@@ -389,7 +422,7 @@ showLogin.addEventListener('click', function(e) {
 });
 
 // Login Functionality
-loginBtn.addEventListener('click', function() {
+loginBtn.addEventListener('click', async function() {
     const usernameOrEmail = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
     const role = document.getElementById('login-role').value;
@@ -399,11 +432,10 @@ loginBtn.addEventListener('click', function() {
         return;
     }
 
-    const users = JSON.parse(localStorage.getItem('coffeeShopUsers'));
-    const user = users.find(u => 
-        (u.username === usernameOrEmail || u.email === usernameOrEmail) && 
-        u.password === password && 
-        u.role === role
+    const user = await loginUser(
+        usernameOrEmail,
+        password,
+        role
     );
 
     if (user) {
@@ -420,7 +452,7 @@ loginBtn.addEventListener('click', function() {
         } else {
             activeSessions.push({
                 username: user.username,
-                name: user.name,
+                name: user.fullname,
                 role: user.role,
                 loginTime: new Date().toLocaleString(),
                 status: 'Active',
@@ -429,14 +461,14 @@ loginBtn.addEventListener('click', function() {
         }
         localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
         showApp();
-        showNotification(`Welcome back, ${user.name}!`, 'success');
+        showNotification(`Welcome back, ${user.fullname}!`, 'success');
     } else {
         showNotification('Invalid username/email, password, or role', 'error');
     }
 });
 
 // Registration Functionality
-registerBtn.addEventListener('click', function() {
+registerBtn.addEventListener('click', async function() {
     const name = document.getElementById('reg-name').value;
     const username = document.getElementById('reg-username').value;
     const password = document.getElementById('reg-password').value;
@@ -448,7 +480,7 @@ registerBtn.addEventListener('click', function() {
         return;
     }
 
-    const users = JSON.parse(localStorage.getItem('coffeeShopUsers'));
+    const users = await getUsers();
     
     if (users.find(u => u.username === username)) {
         showNotification('Username already exists', 'error');
@@ -460,9 +492,23 @@ registerBtn.addEventListener('click', function() {
         return;
     }
 
-    const newUser = { name, username, password, email, role };
-    users.push(newUser);
-    localStorage.setItem('coffeeShopUsers', JSON.stringify(users));
+    const result = await createUser({
+        fullname: name,
+        username: username,
+        password: password,
+        email: email,
+        role: role
+    });
+
+    if (!result.success) {
+
+        showNotification(
+            result.message,
+            'error'
+        );
+
+        return;
+    }
 
     showNotification('Registration successful! You can now login.', 'success');
     registerForm.classList.add('hidden');
@@ -500,7 +546,7 @@ function showApp() {
     appContainer.classList.remove('hidden');
     
     loggedInUser.textContent =
-        `${state.currentUser.name} (${state.currentUser.role})`;
+        `${state.currentUser.fullname} (${state.currentUser.role})`;
 
     const role = getCurrentRole();
 
@@ -2509,7 +2555,7 @@ function cancelPurchaseOrder(orderId) {
         return;
     }
     
-    if (state.currentUser.role === 'admin' || state.currentUser.role === 'manager' || 
+    if (state.currentUser.role === 'Administrator' || state.currentUser.role === 'manager' || 
         (state.currentUser.role === 'staff' && state.currentUser.username === order.createdBy)) {
         if (!confirm(`Are you sure you want to CANCEL purchase order ${order.poNumber}?`)) return;
         
@@ -2953,8 +2999,8 @@ function loadActiveSessions() {
     });
 }
 
-function loadUsers() {
-    const users = JSON.parse(localStorage.getItem('coffeeShopUsers') || '[]');
+async function loadUsers() {
+    const users = await getUsers();
     const usersContainer = document.getElementById('users-list');
     if (!usersContainer) return;
     
@@ -2975,14 +3021,14 @@ function loadUsers() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${user.username} ${isActive ? '<span style="color: #4caf50; font-size: 12px;">(Online)</span>' : ''} ${isCurrentUser ? '<span style="color: #ffb74d; font-size: 12px;">(You)</span>' : ''}</td>
-            <td>${user.name}</td>
+            <td>${user.fullname}</td>
             <td>${user.email}</td>
             <td>${user.role}</td>
             <td>${accountCreated.toLocaleDateString()}</td>
             <td class="action-btns">
                 <button class="action-btn view" data-username="${user.username}">View Profile</button>
                 <button class="action-btn edit" data-username="${user.username}">Edit</button>
-                ${state.currentUser && state.currentUser.role === 'admin' && user.username !== 'admin' && !isCurrentUser ? `<button class="action-btn delete" data-username="${user.username}">Delete</button>` : ''}
+                ${state.currentUser && state.currentUser.role === 'Administrator' && user.username !== 'Administrator' && !isCurrentUser ? `<button class="action-btn delete" data-username="${user.username}">Delete</button>` : ''}
             </td>
         `;
         usersContainer.appendChild(row);
@@ -3010,8 +3056,8 @@ function loadUsers() {
     });
 }
 
-function viewUserProfile(username) {
-    const users = JSON.parse(localStorage.getItem('coffeeShopUsers') || '[]');
+async function viewUserProfile(username) {
+    const users = await getUsers();
     const user = users.find(u => u.username === username);
     if (!user) {
         showNotification('User not found', 'error');
@@ -3024,15 +3070,15 @@ function viewUserProfile(username) {
     
     const profileHTML = `
         <div style="text-align: left; padding: 20px;">
-            <h3 style="color: #5d4037; margin-bottom: 20px;">User Profile: ${user.name}</h3>
+            <h3 style="color: #5d4037; margin-bottom: 20px;">User Profile: ${user.fullname}</h3>
             <div style="background-color: #f9f5f0; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e0d6d0;">
                 <p><strong>Username:</strong> ${user.username}</p>
-                <p><strong>Full Name:</strong> ${user.name}</p>
+                <p><strong>Full Name:</strong> ${user.fullname}</p>
                 <p><strong>Email:</strong> ${user.email}</p>
                 <p><strong>Role:</strong> ${user.role}</p>
                 <p><strong>Status:</strong> <span style="color: ${isActive ? '#4caf50' : '#8d6e63'}">${isActive ? 'Currently Online' : 'Offline'}</span></p>
                 <p><strong>Account Created:</strong> ${new Date().toLocaleDateString()}</p>
-                ${state.currentUser && state.currentUser.role === 'admin' ? '<p><strong>Password:</strong> ********</p>' : ''}
+                ${state.currentUser && state.currentUser.role === 'Administrator' ? '<p><strong>Password:</strong> ********</p>' : ''}
                 ${isCurrentUser ? '<p style="color: #ffb74d; font-size: 14px;"><i class="fas fa-info-circle"></i> This is your account</p>' : ''}
             </div>
         </div>
@@ -3056,15 +3102,15 @@ function viewUserProfile(username) {
     });
 }
 
-function editUserAccount(username) {
-    const users = JSON.parse(localStorage.getItem('coffeeShopUsers') || '[]');
+async function editUserAccount(username) {
+    const users = await getUsers();
     const user = users.find(u => u.username === username);
     if (!user) {
         showNotification('User not found', 'error');
         return;
     }
     
-    if (state.currentUser.role !== 'admin' && state.currentUser.username !== username) {
+    if (state.currentUser.role !== 'Administrator' && state.currentUser.username !== username) {
         showNotification('You can only edit your own account. Only administrators can edit other users.', 'error');
         return;
     }
@@ -3073,17 +3119,17 @@ function editUserAccount(username) {
     
     const editHTML = `
         <div style="text-align: left; padding: 20px;">
-            <h3 style="color: #5d4037; margin-bottom: 20px;">Edit User: ${user.name}</h3>
+            <h3 style="color: #5d4037; margin-bottom: 20px;">Edit User: ${user.fullname}</h3>
             <div style="background-color: #f9f5f0; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e0d6d0;">
                 <div class="form-group">
                     <label for="edit-name"><strong>Full Name</strong></label>
-                    <input type="text" id="edit-name" value="${user.name}" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <input type="text" id="edit-name" value="${user.fullname}" style="width: 100%; padding: 8px; margin-top: 5px;">
                 </div>
                 <div class="form-group">
                     <label for="edit-email"><strong>Email Address</strong></label>
                     <input type="email" id="edit-email" value="${user.email}" style="width: 100%; padding: 8px; margin-top: 5px;">
                 </div>
-                ${state.currentUser.role === 'admin' ? `
+                ${state.currentUser.role === 'Administrator' ? `
                     <div class="form-group">
                         <label for="edit-role"><strong>Role</strong></label>
                         <select id="edit-role" style="width: 100%; padding: 8px; margin-top: 5px;" ${isCurrentUser ? 'disabled' : ''}>
@@ -3123,7 +3169,7 @@ function editUserAccount(username) {
     modal.querySelector('#save-edit-btn').addEventListener('click', function() {
         const name = modal.querySelector('#edit-name').value;
         const email = modal.querySelector('#edit-email').value;
-        const role = state.currentUser.role === 'admin' ? modal.querySelector('#edit-role').value : user.role;
+        const role = state.currentUser.role === 'Administrator' ? modal.querySelector('#edit-role').value : user.role;
         const password = modal.querySelector('#edit-password').value;
         const confirmPassword = modal.querySelector('#edit-confirm-password').value;
         
@@ -3137,36 +3183,49 @@ function editUserAccount(username) {
             return;
         }
         
-        const updatedUsers = users.map(u => {
-            if (u.username === username) {
-                const updatedUser = { ...u, name, email, role };
-                if (password) updatedUser.password = password;
-                return updatedUser;
+        try {
+
+            const response = await fetch(
+                'api/users/update.php',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: user.id,
+                        fullname: name,
+                        email: email,
+                        role: role,
+                        password: password
+                    })
+                }
+            );
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.message);
             }
-            return u;
-        });
-        
-        localStorage.setItem('coffeeShopUsers', JSON.stringify(updatedUsers));
-        
-        if (isCurrentUser) {
-            state.currentUser = updatedUsers.find(u => u.username === username);
-            localStorage.setItem('currentUser', JSON.stringify(state.currentUser));
-            loggedInUser.textContent = state.currentUser.name;
+
+            showNotification(
+                'User account updated successfully!',
+                'success'
+            );
+
+            document.body.removeChild(modal);
+
+            await loadUsers();
+
+        } catch(error) {
+
+            console.error(error);
+
+            showNotification(
+                'Failed to update user.',
+                'error'
+            );
         }
-        
-        const activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-        const updatedSessions = activeSessions.map(session => {
-            if (session.username === username) {
-                return { ...session, name, role };
-            }
-            return session;
-        });
-        localStorage.setItem('activeSessions', JSON.stringify(updatedSessions));
-        
-        showNotification('User account updated successfully!', 'success');
-        document.body.removeChild(modal);
-        loadUsers();
-        loadActiveSessions();
     });
     
     modal.querySelector('#cancel-edit-btn').addEventListener('click', () => document.body.removeChild(modal));
@@ -3175,30 +3234,93 @@ function editUserAccount(username) {
     });
 }
 
-function deleteUserAccount(username) {
+async function deleteUserAccount(username) {
+
+    const users = await getUsers();
+
+    const user = users.find(
+        u => u.username === username
+    );
+
+    if (!user) {
+
+        showNotification(
+            'User not found',
+            'error'
+        );
+
+        return;
+    }
+
     if (username === 'admin') {
-        showNotification('Cannot delete the admin account!', 'error');
+
+        showNotification(
+            'Cannot delete admin account',
+            'error'
+        );
+
         return;
     }
-    
-    if (state.currentUser && state.currentUser.username === username) {
-        showNotification('You cannot delete your own account while logged in!', 'error');
+
+    if (
+        state.currentUser &&
+        state.currentUser.username === username
+    ) {
+
+        showNotification(
+            'You cannot delete your own account',
+            'error'
+        );
+
         return;
     }
-    
-    if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) return;
-    
-    let users = JSON.parse(localStorage.getItem('coffeeShopUsers') || '[]');
-    users = users.filter(user => user.username !== username);
-    localStorage.setItem('coffeeShopUsers', JSON.stringify(users));
-    
-    let activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-    activeSessions = activeSessions.filter(session => session.username !== username);
-    localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
-    
-    showNotification(`User "${username}" has been deleted successfully.`, 'success');
-    loadUsers();
-    loadActiveSessions();
+
+    if (
+        !confirm(
+            `Delete user "${username}"?`
+        )
+    ) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            'api/users/delete.php',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type':
+                        'application/json'
+                },
+                body: JSON.stringify({
+                    id: user.id
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.message);
+        }
+
+        showNotification(
+            'User deleted successfully!',
+            'success'
+        );
+
+        await loadUsers();
+
+    } catch(error) {
+
+        console.error(error);
+
+        showNotification(
+            'Failed to delete user.',
+            'error'
+        );
+    }
 }
 
 // ============================================

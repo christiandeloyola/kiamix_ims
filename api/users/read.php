@@ -15,6 +15,7 @@ try {
             fullname,
             username,
             email,
+            password,
             role,
             created_at
         FROM users

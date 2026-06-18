@@ -11,27 +11,56 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 try {
 
-    $stmt = $pdo->prepare("
-        UPDATE users
-        SET
-            fullname = :fullname,
-            email = :email,
-            role = :role
-        WHERE id = :id
-    ");
+    if (!empty($data['password'])) {
 
-    $stmt->execute([
-        ':fullname' => $data['fullname'],
-        ':email' => $data['email'],
-        ':role' => $data['role'],
-        ':id' => $data['id']
-    ]);
+        $hashedPassword = password_hash(
+            $data['password'],
+            PASSWORD_DEFAULT
+        );
+
+        $stmt = $pdo->prepare("
+            UPDATE users
+            SET
+                fullname = :fullname,
+                email = :email,
+                role = :role,
+                password = :password
+            WHERE id = :id
+        ");
+
+        $stmt->execute([
+            ':fullname' => $data['fullname'],
+            ':email' => $data['email'],
+            ':role' => $data['role'],
+            ':password' => $hashedPassword,
+            ':id' => $data['id']
+        ]);
+
+    } else {
+
+        $stmt = $pdo->prepare("
+            UPDATE users
+            SET
+                fullname = :fullname,
+                email = :email,
+                role = :role
+            WHERE id = :id
+        ");
+
+        $stmt->execute([
+            ':fullname' => $data['fullname'],
+            ':email' => $data['email'],
+            ':role' => $data['role'],
+            ':id' => $data['id']
+        ]);
+
+    }
 
     echo json_encode([
         'success' => true
     ]);
 
-} catch(Exception $e){
+} catch (Exception $e) {
 
     echo json_encode([
         'success' => false,
