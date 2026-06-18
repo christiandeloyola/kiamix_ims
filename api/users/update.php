@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 header('Content-Type: application/json');
 
 require_once '../../config/database.php';
@@ -7,7 +9,44 @@ require_once '../../config/database.php';
 $database = new Database();
 $pdo = $database->connect();
 
+if (!isset($_SESSION['user_id'])) {
+
+    echo json_encode([
+        'success' => false,
+        'message' => 'Unauthorized access'
+    ]);
+
+    exit;
+}
+
 $data = json_decode(file_get_contents("php://input"), true);
+
+$currentUserId =
+    $_SESSION['user_id'];
+
+$currentRole =
+    strtolower(
+        trim($_SESSION['role'])
+    );
+
+$targetUserId =
+    intval($data['id']);
+
+$isAdministrator =
+    $currentRole === 'administrator';
+
+$isOwnAccount =
+    $currentUserId === $targetUserId;
+
+if (!$isAdministrator && !$isOwnAccount) {
+
+    echo json_encode([
+        'success' => false,
+        'message' => 'You are not allowed to edit this user.'
+    ]);
+
+    exit;
+}
 
 try {
 
