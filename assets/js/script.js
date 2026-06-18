@@ -514,7 +514,7 @@ function showApp() {
 
         settingsMenu.style.display =
             role === 'admin'
-                ? ''
+                ? 'block'
                 : 'none';
 
     }
