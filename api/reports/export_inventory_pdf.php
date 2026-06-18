@@ -5,28 +5,47 @@ require_once '../../config/database.php';
 $database = new Database();
 $pdo = $database->connect();
 $category = $_GET['category'] ?? 'all';
+$period = $_GET['period'] ?? 'week';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
+$where = [];
+$params = [];
 
 if ($category !== 'all') {
-
-    $stmt = $pdo->prepare("
-        SELECT *
-        FROM inventory_items
-        WHERE category = :category
-        ORDER BY item_name
-    ");
-
-    $stmt->execute([
-        ':category' => $category
-    ]);
-
-} else {
-
-    $stmt = $pdo->query("
-        SELECT *
-        FROM inventory_items
-        ORDER BY item_name
-    ");
+    $where[] = "category = :category";
+    $params[':category'] = $category;
 }
+
+if (!empty($start_date) && !empty($end_date)) {
+    $where[] = "
+        DATE(created_at)
+        BETWEEN :start_date
+        AND :end_date
+    ";
+
+    $params[':start_date'] = $start_date;
+    $params[':end_date'] = $end_date;
+}
+
+$whereSql = '';
+
+if (!empty($where)) {
+    $whereSql = 'WHERE ' . implode(' AND ', $where);
+}
+
+$stmt = $pdo->prepare("
+    SELECT
+        item_name,
+        category,
+        quantity,
+        unit_price
+    FROM inventory_items
+    $whereSql
+    ORDER BY item_name
+");
+
+$stmt->execute($params);
 
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

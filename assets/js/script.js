@@ -4668,10 +4668,54 @@ function exportReport() {
 
         const category =
             document.getElementById('report-category').value;
+        
+        const period =
+            document.getElementById('report-period').value;
+
+        let startDate, endDate;
+        const today = new Date();
+
+        switch(period){
+
+            case 'today':
+                startDate = new Date(today);
+                endDate = new Date(today);
+                break;
+
+            case 'week':
+                startDate = new Date(today);
+                startDate.setDate(today.getDate() - 7);
+                endDate = new Date(today);
+                break;
+
+            case 'month':
+                startDate = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    1
+                );
+                endDate = new Date(today);
+                break;
+
+            case 'year':
+                startDate = new Date(
+                    today.getFullYear(),
+                    0,
+                    1
+                );
+                endDate = new Date(today);
+                break;
+
+            default:
+                startDate = new Date(today);
+                endDate = new Date(today);
+        }
 
         window.open(
-            `api/reports/export_inventory_pdf.php?category=${encodeURIComponent(category)}`,
-            '_blank'
+            `api/reports/export_inventory_pdf.php?period=${period}` +
+            `&category=${category}` +
+            `&start_date=${startDate.toISOString().split('T')[0]}` +
+            `&end_date=${endDate.toISOString().split('T')[0]}`
         );
 
     } else if (choice.toUpperCase() === "CSV") {
