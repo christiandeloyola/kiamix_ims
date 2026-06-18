@@ -524,7 +524,6 @@ function showApp() {
     updateInventoryCache();
     updateDashboardStats();
     loadRecentItems();
-    loadInventoryItems();
     loadPurchaseOrders();
     loadSuppliers();
     
@@ -890,8 +889,6 @@ async function loadInventoryItems() {
         );
 
         const items = await response.json();
-
-        console.log('Inventory API:', items);
 
         inventoryContainer.innerHTML = '';
 
