@@ -147,20 +147,27 @@
                                 <span class="menu-text">Reports</span>
                             </a>
                         </li>
-                        <li>
-                            <li
-                                id="settings-menu"
-                                class="sidebar-item"
-                                data-page="settings">
+                        <li id="settings-menu">
 
+                            <a href="#" data-page="settings">
                                 <i class="fas fa-cog"></i>
-                                <span>Settings</span>
+                                <span class="menu-text">Settings</span>
+                            </a>
 
-                            </li>
                             <ul class="dropdown-menu">
-                                <li><a href="#" data-page="settings-general">General Settings</a></li>
-                                <li><a href="#" data-page="user-management">User Management</a></li>
+                                <li>
+                                    <a href="#" data-page="settings-general">
+                                        General Settings
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="#" data-page="user-management">
+                                        User Management
+                                    </a>
+                                </li>
                             </ul>
+
                         </li>
                     </ul>
                 </nav>
