@@ -4325,6 +4325,8 @@ function initializeReports() {
 }
 
 function generateReport() {
+    console.log('generateReport() called');
+
     const period = document.getElementById('report-period')?.value || 'week';
     const category = document.getElementById('report-category')?.value || 'all';
     
@@ -4360,9 +4362,13 @@ function generateReport() {
             break;
     }
     
+    console.log('Fetching report data...');
+
     fetch('api/reports/dashboard.php')
     .then(response => response.json())
     .then(data => {
+
+        console.log('Report API Response:', data);
 
         document.getElementById('report-total-items').textContent =
             data.total_items;
