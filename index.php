@@ -34,9 +34,9 @@
                 <div class="form-group">
                     <label for="login-role"><i class="fas fa-user-tag"></i> Login as</label>
                     <select id="login-role">
-                        <option value="admin">Administrator</option>
-                        <option value="manager">Store Manager</option>
-                        <option value="staff">Staff Member</option>
+                        <option value="Administrator">Administrator</option>
+                        <option value="Store Manager">Store Manager</option>
+                        <option value="Staff">Staff Member</option>
                     </select>
                 </div>
                 <button class="btn" id="login-btn">Login <i class="fas fa-sign-in-alt"></i></button>
