@@ -336,20 +336,25 @@ header {
 
 /* Dropdown Menu Styles */
 .dropdown-menu {
+    display: none;
     list-style: none;
     background-color: rgba(93, 64, 55, 0.9);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    padding-left: 0;
+    padding-left: 20px;
 }
 
-.dropdown-menu.show {
-    max-height: 500px;
+#settings-menu.active .dropdown-menu {
+    display: block;
 }
 
 .dropdown-menu li a {
-    padding-left: 50px;
+    display: block;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+}
+
+.dropdown-menu li a:hover {
+    background: rgba(255,255,255,0.1);
 }
 
 /* Content Area */
@@ -1192,6 +1197,7 @@ textarea:focus {
 .dropdown-menu {
     display: none;
     list-style: none;
+    background-color: rgba(93, 64, 55, 0.9);
     padding-left: 20px;
 }
 
