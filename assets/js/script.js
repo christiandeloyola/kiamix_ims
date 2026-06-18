@@ -504,15 +504,15 @@ function showApp() {
 
     const role = getCurrentRole();
 
+    console.log("Current User:", state.currentUser);
+    console.log("Current Role:", role);
+
     const settingsMenu =
         document.getElementById('settings-menu');
 
     if (settingsMenu) {
 
-        settingsMenu.style.display =
-            role === 'Administrator'
-                ? ''
-                : 'none';
+        settingsMenu.style.display = 'block';
 
     }
     
