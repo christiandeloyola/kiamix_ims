@@ -824,6 +824,8 @@ async function loadInventoryItems() {
 
         const items = await response.json();
 
+        console.log('Inventory API:', items);
+
         inventoryContainer.innerHTML = '';
 
         if (!items || items.length === 0) {
