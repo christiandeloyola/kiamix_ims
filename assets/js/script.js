@@ -4194,8 +4194,7 @@ function generateReport() {
 
         generateCharts(
             data.inventory_items || [],
-            category,
-            data.monthly_values || []
+            category
         );
 
         showNotification(
@@ -4235,9 +4234,8 @@ function updateReportMetrics(items, orders, startDate, endDate) {
     if (lowStockEl) lowStockEl.textContent = lowStockCount;
 }
 
-function generateCharts(items, categoryFilter, monthlyValues = []) {
+function generateCharts(items, categoryFilter) {
     if (window.categoryChart) window.categoryChart.destroy();
-    if (window.trendChart) window.trendChart.destroy();
     
     const categories = {};
     items.forEach(item => {
@@ -4298,54 +4296,6 @@ function generateCharts(items, categoryFilter, monthlyValues = []) {
     } else if (noChartData && categoryChart) {
         noChartData.style.display = 'block';
         categoryChart.style.display = 'none';
-    }
-    
-    const trendLabels = monthlyValues.map(
-        item => item.month
-    );
-
-    const trendData = monthlyValues.map(
-        item => Number(item.value)
-    );
-
-    console.log("Monthly Values:", monthlyValues);
-    console.log("Trend Labels:", trendLabels);
-    console.log("Trend Data:", trendData);
-    
-    const noTrendData = document.getElementById('no-trend-data');
-    const trendChart = document.getElementById('trend-chart');
-    
-    if (noTrendData && trendChart) {
-        noTrendData.style.display = 'none';
-        trendChart.style.display = 'block';
-        
-        const trendCtx = trendChart.getContext('2d');
-        window.trendChart = new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: trendLabels,
-                datasets: [{
-                    label: 'Stock Value Trend',
-                    data: trendData,
-                    borderColor: '#8d6e63',
-                    backgroundColor: 'rgba(141, 110, 99, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: true, position: 'top' } },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        ticks: { callback: value => '₱' + value.toLocaleString() }
-                    }
-                }
-            }
-        });
     }
 }
 

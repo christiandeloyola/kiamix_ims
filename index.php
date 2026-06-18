@@ -541,15 +541,6 @@
                                     <canvas id="category-chart" style="display: none; max-width: 100%;"></canvas>
                                 </div>
                             </div>
-                            <div class="form-container" style="flex: 1;">
-                                <h3 style="margin-bottom: 20px; color: #5d4037;">
-                                    <i class="fas fa-chart-line"></i> Stock Value Trend
-                                </h3>
-                                <div class="chart-container">
-                                    <p id="no-trend-data" class="chart-placeholder">Trend chart will appear here when report is generated</p>
-                                    <canvas id="trend-chart" style="display: none; max-width: 100%;"></canvas>
-                                </div>
-                            </div>
                         </div>
                         <div class="form-row" style="margin-top: 30px;">
                             <div class="form-container" style="flex: 1;">
