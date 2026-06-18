@@ -4738,12 +4738,68 @@ function exportReport() {
         const category =
             document.getElementById('report-category').value;
 
-        window.location.href =
-            `api/reports/export_inventory_csv.php?period=${encodeURIComponent(period)}` +
-            `&category=${encodeURIComponent(category)}` +
-            `&start_date=${encodeURIComponent(startDate)}` +
-            `&end_date=${encodeURIComponent(endDate)}`;
+        const period =
+            document.getElementById('report-period').value;
 
+        let startDate = '';
+        let endDate = '';
+
+        if (period === 'custom') {
+
+            startDate =
+                document.getElementById('report-start-date').value;
+
+            endDate =
+                document.getElementById('report-end-date').value;
+
+        } else {
+
+            const today = new Date();
+
+            switch (period) {
+
+                case 'today':
+                    startDate = today.toISOString().split('T')[0];
+                    endDate = today.toISOString().split('T')[0];
+                    break;
+
+                case 'week':
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - 7);
+
+                    startDate = weekStart.toISOString().split('T')[0];
+                    endDate = today.toISOString().split('T')[0];
+                    break;
+
+                case 'month':
+                    const monthStart = new Date(
+                        today.getFullYear(),
+                        today.getMonth(),
+                        1
+                    );
+
+                    startDate = monthStart.toISOString().split('T')[0];
+                    endDate = today.toISOString().split('T')[0];
+                    break;
+
+                case 'year':
+                    const yearStart = new Date(
+                        today.getFullYear(),
+                        0,
+                        1
+                    );
+
+                    startDate = yearStart.toISOString().split('T')[0];
+                    endDate = today.toISOString().split('T')[0];
+                    break;
+            }
+        }
+
+        window.location.href =
+            `api/reports/export_inventory_csv.php?period=${encodeURIComponent(period)}`
+            + `&category=${encodeURIComponent(category)}`
+            + `&start_date=${encodeURIComponent(startDate)}`
+            + `&end_date=${encodeURIComponent(endDate)}`;
     } else {
 
         alert("Please enter PDF or CSV");
