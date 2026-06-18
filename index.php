@@ -148,8 +148,7 @@
                             </a>
                         </li>
                         <li id="settings-menu">
-
-                            <a href="#" data-page="settings">
+                            <a href="#" data-page="settings-general">
                                 <i class="fas fa-cog"></i>
                                 <span class="menu-text">Settings</span>
                             </a>
