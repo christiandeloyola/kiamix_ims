@@ -8,6 +8,29 @@ const state = {
     currentPage: 'dashboard'
 };
 
+let currentUserRole = '';
+
+async function loadCurrentUser() {
+
+    try {
+
+        const response = await fetch(
+            'api/auth/current_user.php'
+        );
+
+        const result = await response.json();
+
+        if(result.success){
+
+            currentUserRole = result.role;
+        }
+
+    } catch(error){
+
+        console.error(error);
+    }
+}
+
 async function getUsers() {
 
     const response = await fetch(
@@ -2615,61 +2638,103 @@ function viewOrderDetails(orderId) {
                 "
             >
 
-                ${
-                    order.status === 'Pending'
-                    ? `
-                    <button
-                        class="btn btn-success"
-                        onclick="approvePurchaseOrder(${order.id})">
-                        Approve
-                    </button>
+            ${
 
-                    <button
-                        class="btn btn-danger"
-                        onclick="cancelPurchaseOrder(${order.id})">
-                        Cancel
-                    </button>
-                    `
-                    : ''
-                }
+                order.status === 'Pending'
+                &&
+                currentUserRole === 'Administrator'
 
-                ${
-                    order.status === 'Approved'
-                    ? `
-                    <button
-                        class="btn btn-primary"
-                        onclick="shipPurchaseOrder(${order.id})">
-                        Ship
-                    </button>
-                    `
-                    : ''
-                }
+                ?
 
-                ${
-                    order.status === 'Shipped'
-                    ? `
-                    <button
-                        class="btn btn-success"
-                        onclick="deliverPurchaseOrder(${order.id})">
-                        Deliver
-                    </button>
-                    `
-                    : ''
-                }
+                `
+
+                <button
+                    class="btn btn-success"
+                    onclick="approvePurchaseOrder(${order.id})"
+                >
+                    Approve
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="cancelPurchaseOrder(${order.id})"
+                >
+                    Cancel
+                </button>
+
+                `
+
+                : ''
+
+            }
+
+            ${
+
+                order.status === 'Approved'
+                &&
+                (
+                    currentUserRole === 'Administrator'
+                    ||
+                    currentUserRole === 'Store Manager'
+                )
+
+                ?
+
+                `
 
                 <button
                     class="btn btn-primary"
-                    onclick="exportPurchaseOrder(${order.id})">
-                    Export Receipt
+                    onclick="shipPurchaseOrder(${order.id})"
+                >
+                    Ship
                 </button>
+
+                `
+
+                : ''
+
+            }
+
+            ${
+
+                order.status === 'Shipped'
+                &&
+                (
+                    currentUserRole === 'Administrator'
+                    ||
+                    currentUserRole === 'Store Manager'
+                )
+
+                ?
+
+                `
 
                 <button
-                    class="btn"
-                    id="close-po-modal">
-
-                    Close
-
+                    class="btn btn-success"
+                    onclick="deliverPurchaseOrder(${order.id})"
+                >
+                    Deliver
                 </button>
+
+                `
+
+                : ''
+
+            }
+
+            <button
+                class="btn btn-primary"
+                onclick="exportPurchaseOrder(${order.id})"
+            >
+                Export Receipt
+            </button>
+
+            <button
+                class="btn"
+                id="close-po-modal"
+            >
+                Close
+            </button>
 
             </div>
 
@@ -4510,7 +4575,10 @@ function initializeGeneralSettings() {
 }
 
 // Initialize everything
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
+
+    await loadCurrentUser();
+
     initializePOItemEventListeners();
     initializeGeneralSettings();
 

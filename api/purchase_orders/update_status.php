@@ -14,20 +14,6 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-if (
-    $_SESSION['role'] !== 'Administrator'
-    &&
-    $_SESSION['role'] !== 'Store Manager'
-){
-
-    echo json_encode([
-        "success" => false,
-        "message" => "Access denied"
-    ]);
-
-    exit();
-}
-
 include_once "../../config/database.php";
 
 $database = new Database();
@@ -49,6 +35,71 @@ if (
     ]);
 
     exit;
+}
+
+$role = $_SESSION['role'];
+$status = $data->status;
+
+if (
+    $status === 'Approved'
+    &&
+    $role !== 'Administrator'
+){
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Only Administrators can approve orders"
+    ]);
+
+    exit();
+}
+
+if (
+    $status === 'Cancelled'
+    &&
+    $role !== 'Administrator'
+){
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Only Administrators can cancel orders"
+    ]);
+
+    exit();
+}
+
+if (
+    $status === 'Shipped'
+    &&
+    !in_array(
+        $role,
+        ['Administrator','Store Manager']
+    )
+){
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Access denied"
+    ]);
+
+    exit();
+}
+
+if (
+    $status === 'Delivered'
+    &&
+    !in_array(
+        $role,
+        ['Administrator','Store Manager']
+    )
+){
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Access denied"
+    ]);
+
+    exit();
 }
 
 $query = "
