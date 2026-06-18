@@ -1188,3 +1188,24 @@ textarea:focus {
     background:#d7ccc8;
     color:#4e342e;
 }
+
+.dropdown-menu {
+    display: none;
+    list-style: none;
+    padding-left: 20px;
+}
+
+#settings-menu.active .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu li a {
+    display: block;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+}
+
+.dropdown-menu li a:hover {
+    background: rgba(255,255,255,0.1);
+}

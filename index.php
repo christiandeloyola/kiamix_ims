@@ -148,7 +148,7 @@
                             </a>
                         </li>
                         <li id="settings-menu">
-                            <a href="#" data-page="settings-general">
+                            <a href="#" id="settings-toggle">
                                 <i class="fas fa-cog"></i>
                                 <span class="menu-text">Settings</span>
                             </a>

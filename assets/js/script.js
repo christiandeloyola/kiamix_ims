@@ -598,6 +598,9 @@ function showLoginPage() {
 
 sidebarMenuItems.forEach(item => {
     item.addEventListener('click', function(e) {
+        if (this.id === 'settings-toggle') {
+            return;
+        }
         e.preventDefault();
         const pageId = this.getAttribute('data-page');
         
@@ -617,6 +620,24 @@ sidebarMenuItems.forEach(item => {
         showPage(pageId);
     });
 });
+
+const settingsToggle =
+    document.getElementById('settings-toggle');
+
+const settingsMenu =
+    document.getElementById('settings-menu');
+
+if (settingsToggle && settingsMenu) {
+
+    settingsToggle.addEventListener('click', function(e) {
+
+        e.preventDefault();
+
+        settingsMenu.classList.toggle('active');
+
+    });
+
+}
 
 function setActiveMenuItem(pageId) {
     sidebarMenuItems.forEach(item => {
