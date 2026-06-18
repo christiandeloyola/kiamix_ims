@@ -1,58 +1,105 @@
 <?php
 
-require_once '../../config/database.php';
+require_once '../config/database.php';
 
 $database = new Database();
 $pdo = $database->connect();
+
 $category = $_GET['category'] ?? 'all';
+$period = $_GET['period'] ?? 'week';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
 
+$where = [];
+$params = [];
 
+/*
+|--------------------------------------------------------------------------
+| Category Filter
+|--------------------------------------------------------------------------
+*/
+if ($category !== 'all') {
+    $where[] = "category = :category";
+    $params[':category'] = $category;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Date Filter
+|--------------------------------------------------------------------------
+*/
+if (!empty($start_date) && !empty($end_date)) {
+    $where[] = "
+        DATE(created_at)
+        BETWEEN :start_date
+        AND :end_date
+    ";
+
+    $params[':start_date'] = $start_date;
+    $params[':end_date'] = $end_date;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Build WHERE Clause
+|--------------------------------------------------------------------------
+*/
+$whereSql = '';
+
+if (!empty($where)) {
+    $whereSql = 'WHERE ' . implode(' AND ', $where);
+}
+
+/*
+|--------------------------------------------------------------------------
+| CSV Headers
+|--------------------------------------------------------------------------
+*/
 header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="inventory_report.csv"');
 
 $output = fopen('php://output', 'w');
 
+/*
+|--------------------------------------------------------------------------
+| CSV Column Headers
+|--------------------------------------------------------------------------
+*/
 fputcsv($output, [
     'Item Name',
     'Category',
     'Quantity',
     'Unit',
     'Unit Price',
-    'Stock Value'
+    'Stock Value',
+    'Created Date'
 ]);
 
-if ($category !== 'all') {
+/*
+|--------------------------------------------------------------------------
+| Query Inventory
+|--------------------------------------------------------------------------
+*/
+$stmt = $pdo->prepare("
+    SELECT
+        item_name,
+        category,
+        quantity,
+        unit,
+        unit_price,
+        created_at
+    FROM inventory_items
+    $whereSql
+    ORDER BY item_name
+");
 
-    $stmt = $pdo->prepare("
-        SELECT
-            item_name,
-            category,
-            quantity,
-            unit,
-            unit_price
-        FROM inventory_items
-        WHERE category = :category
-        ORDER BY item_name
-    ");
+$stmt->execute($params);
 
-    $stmt->execute([
-        ':category' => $category
-    ]);
-
-} else {
-
-    $stmt = $pdo->query("
-        SELECT
-            item_name,
-            category,
-            quantity,
-            unit,
-            unit_price
-        FROM inventory_items
-        ORDER BY item_name
-    ");
-}
-
+/*
+|--------------------------------------------------------------------------
+| Export Rows
+|--------------------------------------------------------------------------
+*/
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
     $stockValue =
@@ -64,8 +111,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $row['category'],
         $row['quantity'],
         $row['unit'],
-        $row['unit_price'],
-        $stockValue
+        number_format($row['unit_price'], 2, '.', ''),
+        number_format($stockValue, 2, '.', ''),
+        date('Y-m-d', strtotime($row['created_at']))
     ]);
 }
 

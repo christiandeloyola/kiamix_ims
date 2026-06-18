@@ -4672,43 +4672,58 @@ function exportReport() {
         const period =
             document.getElementById('report-period').value;
 
-        let startDate, endDate;
-        const today = new Date();
+        let startDate;
+        let endDate;
 
-        switch(period){
+        if (period === 'custom') {
 
-            case 'today':
-                startDate = new Date(today);
-                endDate = new Date(today);
-                break;
+            startDate =
+                document.getElementById('start-date').value;
 
-            case 'week':
-                startDate = new Date(today);
-                startDate.setDate(today.getDate() - 7);
-                endDate = new Date(today);
-                break;
+            endDate =
+                document.getElementById('end-date').value;
 
-            case 'month':
-                startDate = new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    1
-                );
-                endDate = new Date(today);
-                break;
+        } else {
 
-            case 'year':
-                startDate = new Date(
-                    today.getFullYear(),
-                    0,
-                    1
-                );
-                endDate = new Date(today);
-                break;
+            const today = new Date();
 
-            default:
-                startDate = new Date(today);
-                endDate = new Date(today);
+            switch (period) {
+
+                case 'today':
+                    startDate = today;
+                    endDate = today;
+                    break;
+
+                case 'week':
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - 7);
+                    endDate = today;
+                    break;
+
+                case 'month':
+                    startDate = new Date(
+                        today.getFullYear(),
+                        today.getMonth(),
+                        1
+                    );
+                    endDate = today;
+                    break;
+
+                case 'year':
+                    startDate = new Date(
+                        today.getFullYear(),
+                        0,
+                        1
+                    );
+                    endDate = today;
+                    break;
+            }
+
+            startDate =
+                startDate.toISOString().split('T')[0];
+
+            endDate =
+                endDate.toISOString().split('T')[0];
         }
 
         window.open(
@@ -4724,7 +4739,10 @@ function exportReport() {
             document.getElementById('report-category').value;
 
         window.location.href =
-            `api/reports/export_inventory_csv.php?category=${encodeURIComponent(category)}`;
+            `api/reports/export_inventory_csv.php?period=${period}` +
+            `&category=${encodeURIComponent(category)}` +
+            `&start_date=${startDate}` +
+            `&end_date=${endDate}`;
 
     } else {
 
