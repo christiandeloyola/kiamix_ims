@@ -329,24 +329,6 @@ loginBtn.addEventListener('click', async function() {
         state.currentUser = user;
         state.isLoggedIn = true;
         localStorage.setItem('currentUser', JSON.stringify(user));
-        
-        const activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-        const existingSessionIndex = activeSessions.findIndex(session => session.username === user.username);
-        
-        if (existingSessionIndex !== -1) {
-            activeSessions[existingSessionIndex].loginTime = new Date().toLocaleString();
-            activeSessions[existingSessionIndex].status = 'Active';
-        } else {
-            activeSessions.push({
-                username: user.username,
-                name: user.fullname,
-                role: user.role,
-                loginTime: new Date().toLocaleString(),
-                status: 'Active',
-                ipAddress: '192.168.1.' + Math.floor(Math.random() * 255)
-            });
-        }
-        localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
         showApp();
         showNotification(`Welcome back, ${user.fullname}!`, 'success');
     } else {
@@ -409,15 +391,6 @@ registerBtn.addEventListener('click', async function() {
 
 // Logout Functionality
 logoutBtn.addEventListener('click', function() {
-    if (state.currentUser) {
-        const activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-        const sessionIndex = activeSessions.findIndex(session => session.username === state.currentUser.username);
-        if (sessionIndex !== -1) {
-            activeSessions.splice(sessionIndex, 1);
-            localStorage.setItem('activeSessions', JSON.stringify(activeSessions));
-        }
-    }
-    
     state.currentUser = null;
     state.isLoggedIn = false;
     localStorage.removeItem('currentUser');
@@ -584,7 +557,6 @@ function showPage(pageId) {
             loadPurchaseOrders();
         } else if (pageId === 'user-management') {
             loadUsers();
-            loadActiveSessions();
         } else if (pageId === 'suppliers') {
             loadSuppliers();
         } else if (pageId === 'reports') {
@@ -2882,34 +2854,6 @@ function printOrder(orderId) {
 // ============================================
 // USER MANAGEMENT FUNCTIONS
 // ============================================
-function loadActiveSessions() {
-    const activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-    const sessionsContainer = document.getElementById('active-sessions');
-    if (!sessionsContainer) return;
-    
-    sessionsContainer.innerHTML = '';
-    
-    if (activeSessions.length === 0) {
-        sessionsContainer.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #8d6e63;">No active sessions</td></tr>';
-        return;
-    }
-    
-    activeSessions.sort((a, b) => new Date(b.loginTime) - new Date(a.loginTime));
-    
-    activeSessions.forEach(session => {
-        const row = document.createElement('tr');
-        const isCurrentUser = state.currentUser && state.currentUser.username === session.username;
-        row.innerHTML = `
-            <td>${session.username} ${isCurrentUser ? '<span style="color: #ffb74d; font-size: 12px;">(You)</span>' : ''}</td>
-            <td>${session.name}</td>
-            <td>${session.role}</td>
-            <td>${session.loginTime}</td>
-            <td><span style="color: #4caf50; font-weight: 600;">${session.status}</span></td>
-        `;
-        sessionsContainer.appendChild(row);
-    });
-}
-
 async function loadUsers() {
 
     try {
@@ -3002,8 +2946,6 @@ async function viewUserProfile(username) {
         return;
     }
     
-    const activeSessions = JSON.parse(localStorage.getItem('activeSessions') || '[]');
-    const isActive = activeSessions.some(session => session.username === username);
     const isCurrentUser = state.currentUser && state.currentUser.username === username;
     
     const profileHTML = `
