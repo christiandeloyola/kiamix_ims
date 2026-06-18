@@ -8,14 +8,17 @@ $response = [
     "data" => []
 ];
 
-if (isset($_SESSION['user'])) {
+if (
+    isset($_SESSION['user_id']) &&
+    isset($_SESSION['username'])
+) {
 
-    $response["success"] = true;
+    $response['success'] = true;
 
-    $response["data"][] = [
-        "username"   => $_SESSION['user']['username'],
-        "fullname"   => $_SESSION['user']['fullname'],
-        "role"       => $_SESSION['user']['role'],
+    $response['data'][] = [
+        "username" => $_SESSION['username'],
+        "fullname" => $_SESSION['fullname'],
+        "role" => $_SESSION['role'],
         "login_time" => date('Y-m-d H:i:s')
     ];
 }
