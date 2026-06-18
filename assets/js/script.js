@@ -544,7 +544,7 @@ function showApp() {
     appContainer.classList.remove('hidden');
     
     loggedInUser.textContent =
-        `${state.currentUser.fullname} (${state.currentUser.role})`;
+        `${state.currentUser.name} (${state.currentUser.role})`;
 
     const role = getCurrentRole();
 
