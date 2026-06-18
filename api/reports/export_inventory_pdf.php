@@ -4,12 +4,29 @@ require_once '../../config/database.php';
 
 $database = new Database();
 $pdo = $database->connect();
+$category = $_GET['category'] ?? 'all';
 
-$stmt = $pdo->query("
-    SELECT *
-    FROM inventory_items
-    ORDER BY item_name
-");
+if ($category !== 'all') {
+
+    $stmt = $pdo->prepare("
+        SELECT *
+        FROM inventory_items
+        WHERE category = :category
+        ORDER BY item_name
+    ");
+
+    $stmt->execute([
+        ':category' => $category
+    ]);
+
+} else {
+
+    $stmt = $pdo->query("
+        SELECT *
+        FROM inventory_items
+        ORDER BY item_name
+    ");
+}
 
 $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

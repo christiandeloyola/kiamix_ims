@@ -3,6 +3,7 @@
 header("Content-Type: application/json");
 
 include_once "../../config/database.php";
+require_once "../logs/audit.php";
 
 $database = new Database();
 $db = $database->connect();
@@ -29,6 +30,14 @@ $stmt = $db->prepare($query);
 $stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
 if($stmt->execute()){
+
+    logAction(
+        $db,
+        1,
+        'DELETE',
+        'INVENTORY',
+        'Deleted inventory item ID: ' . $id
+    );
 
     echo json_encode([
         "success" => true,

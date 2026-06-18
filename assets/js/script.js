@@ -4304,15 +4304,21 @@ function exportReport() {
 
     if (choice.toUpperCase() === "PDF") {
 
+        const category =
+            document.getElementById('report-category').value;
+
         window.open(
-            "api/reports/export_inventory_pdf.php",
-            "_blank"
+            `api/reports/export_inventory_pdf.php?category=${encodeURIComponent(category)}`,
+            '_blank'
         );
 
     } else if (choice.toUpperCase() === "CSV") {
 
+        const category =
+            document.getElementById('report-category').value;
+
         window.location.href =
-            "api/reports/export_inventory_csv.php";
+            `api/reports/export_inventory_csv.php?category=${encodeURIComponent(category)}`;
 
     } else {
 

@@ -3,6 +3,7 @@
 header("Content-Type: application/json");
 
 include_once "../../config/database.php";
+require_once "../logs/audit.php";
 
 $database = new Database();
 $db = $database->connect();
@@ -50,6 +51,14 @@ $stmt->bindParam(":supplier_id",$data->supplier_id,PDO::PARAM_INT);
 $stmt->bindParam(":description",$data->description);
 
 if($stmt->execute()){
+
+    logAction(
+        $db,
+        1,
+        'UPDATE',
+        'INVENTORY',
+        'Updated inventory item: ' . $data->item_name
+    );
 
     echo json_encode([
         "success" => true,
