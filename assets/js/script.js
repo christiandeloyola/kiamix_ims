@@ -3090,6 +3090,16 @@ async function viewUserProfile(username) {
     }
     
     const isCurrentUser = state.currentUser && state.currentUser.username === username;
+
+    const activeSessions =
+        JSON.parse(
+            localStorage.getItem('activeSessions') || '[]'
+        );
+
+    const isActive =
+        activeSessions.some(
+            session => session.username === username
+        );
     
     const profileHTML = `
         <div style="text-align: left; padding: 20px;">
