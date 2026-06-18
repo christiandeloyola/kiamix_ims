@@ -4678,10 +4678,10 @@ function exportReport() {
         if (period === 'custom') {
 
             startDate =
-                document.getElementById('start-date').value;
+                document.getElementById('report-start-date').value;
 
             endDate =
-                document.getElementById('end-date').value;
+                document.getElementById('report-end-date').value;
 
         } else {
 
