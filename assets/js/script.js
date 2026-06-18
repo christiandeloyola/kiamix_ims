@@ -328,7 +328,6 @@ loginBtn.addEventListener('click', async function() {
     if (user) {
         state.currentUser = user;
         state.isLoggedIn = true;
-        localStorage.setItem('currentUser', JSON.stringify(user));
         showApp();
         showNotification(`Welcome back, ${user.fullname}!`, 'success');
     } else {
@@ -393,7 +392,6 @@ registerBtn.addEventListener('click', async function() {
 logoutBtn.addEventListener('click', function() {
     state.currentUser = null;
     state.isLoggedIn = false;
-    localStorage.removeItem('currentUser');
     showLoginPage();
     showNotification('Logged out successfully', 'info');
 });
