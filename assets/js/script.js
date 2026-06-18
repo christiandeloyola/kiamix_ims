@@ -580,8 +580,8 @@ function showApp() {
 
     const role =
         (state.currentUser?.role || '')
-            .toLowerCase()
-            .trim();
+            .trim()
+            .toLowerCase();
 
     console.log("Current User:", state.currentUser);
     console.log("Current Role:", role);
@@ -592,7 +592,7 @@ function showApp() {
     if (settingsMenu) {
 
         settingsMenu.style.display =
-            role === 'Administrator'
+            role === 'administrator'
                 ? 'block'
                 : 'none';
 
@@ -607,7 +607,7 @@ function showApp() {
     const reportsMenu =
         document.querySelector('[data-page="reports"]');
 
-    if (role === 'Staff') {
+    if (role === 'staff') {
 
         if (inventoryAddMenu)
             inventoryAddMenu.style.display = 'none';
