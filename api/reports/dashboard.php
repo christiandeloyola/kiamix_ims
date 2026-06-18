@@ -43,16 +43,6 @@ try {
     $response['low_stock'] =
         (int)$stmt->fetch(PDO::FETCH_ASSOC)['low_stock'];
 
-    // MOVEMENTS
-
-    $stmt = $pdo->query("
-        SELECT COUNT(*) movement_items
-        FROM stock_movements
-    ");
-
-    $response['movement_items'] =
-        (int)$stmt->fetch(PDO::FETCH_ASSOC)['movement_items'];
-
     // CATEGORY DISTRIBUTION
 
     $stmt = $pdo->query("
