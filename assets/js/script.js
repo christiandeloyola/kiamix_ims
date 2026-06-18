@@ -152,7 +152,6 @@ function getItemDetailsById(itemId) {
 // GENERATE PO NUMBER
 // ============================================
 function generatePONumber() {
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
     if (orders.length === 0) return 'PO-001';
     const poNumbers = orders.map(order => {
         const match = order.poNumber.match(/PO-(\d+)/);
@@ -163,7 +162,6 @@ function generatePONumber() {
 }
 
 function reorderPONumbers() {
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
     const sortedOrders = [...orders].sort((a, b) => new Date(a.date) - new Date(b.date) || a.id - b.id);
     const renumberedOrders = sortedOrders.map((order, index) => ({
         ...order,
@@ -542,28 +540,61 @@ function showLoginPage() {
 }
 
 sidebarMenuItems.forEach(item => {
+
     item.addEventListener('click', function(e) {
+
         if (this.id === 'settings-toggle') {
             return;
         }
+
         e.preventDefault();
-        const pageId = this.getAttribute('data-page');
-        
+
+        const pageId =
+            this.getAttribute('data-page');
+
         if (this.querySelector('.arrow')) {
-            const dropdown = this.parentElement.querySelector('.dropdown-menu');
+
+            const dropdown =
+                this.parentElement.querySelector('.dropdown-menu');
+
             dropdown.classList.toggle('show');
-            const arrow = this.querySelector('.arrow i');
-            arrow.style.transform = dropdown.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+
+            const arrow =
+                this.querySelector('.arrow i');
+
+            arrow.style.transform =
+                dropdown.classList.contains('show')
+                ? 'rotate(90deg)'
+                : 'rotate(0deg)';
+
+            return;
         }
-        
-        let menuItem = this;
-        if (this.parentElement.parentElement.classList.contains('dropdown-menu')) {
-            menuItem = this.closest('.sidebar-menu li > a');
-        }
-        
+
         setActiveMenuItem(pageId);
+
         showPage(pageId);
+
     });
+
+});
+
+document
+.querySelectorAll('.dropdown-menu a')
+.forEach(link => {
+
+    link.addEventListener('click', function(e) {
+
+        e.preventDefault();
+
+        const pageId =
+            this.getAttribute('data-page');
+
+        setActiveMenuItem(pageId);
+
+        showPage(pageId);
+
+    });
+
 });
 
 const settingsToggle =
@@ -632,7 +663,11 @@ function showPage(pageId) {
 
     if (!targetPage) {
 
-        showPage('dashboard');
+        console.error(
+            'Page not found:',
+            pageId
+        );
+
         return;
     }
 
@@ -741,6 +776,18 @@ async function updateDashboardStats() {
 
         document.getElementById('low-stock').textContent =
             lowStockCount;
+
+            const poResponse =
+                await fetch(
+                    'api/purchase_orders/read.php'
+                );
+
+            const orders =
+                await poResponse.json();
+
+            document.getElementById(
+                'total-orders'
+            ).textContent = orders.length;
 
     } catch (error) {
 
@@ -2518,7 +2565,6 @@ function handleDeleteOrder(e) {
 
 function deletePurchaseOrder(orderId, poNumber) {
     try {
-        let orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
         const orderToDelete = orders.find(o => o.id === orderId);
         
         if (!orderToDelete) {
@@ -2963,7 +3009,6 @@ function clearOrderFilters() {
 }
 
 function printOrder(orderId) {
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
     const order = orders.find(o => o.id === orderId);
     if (!order) {
         showNotification('Order not found', 'error');
