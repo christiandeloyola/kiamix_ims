@@ -148,11 +148,15 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" data-page="settings">
+                            <li
+                                id="settings-menu"
+                                class="sidebar-item"
+                                data-page="settings">
+
                                 <i class="fas fa-cog"></i>
-                                <span class="menu-text">Settings</span>
-                                <span class="arrow"><i class="fas fa-chevron-right"></i></span>
-                            </a>
+                                <span>Settings</span>
+
+                            </li>
                             <ul class="dropdown-menu">
                                 <li><a href="#" data-page="settings-general">General Settings</a></li>
                                 <li><a href="#" data-page="user-management">User Management</a></li>

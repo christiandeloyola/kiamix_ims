@@ -8,6 +8,12 @@ const state = {
     currentPage: 'dashboard'
 };
 
+function getCurrentRole() {
+
+    return state.currentUser?.role || '';
+
+}
+
 // Inventory items cache for PO item price lookup
 let inventoryItemsCache = [];
 
@@ -493,7 +499,22 @@ function showApp() {
     loginPage.classList.add('hidden');
     appContainer.classList.remove('hidden');
     
-    loggedInUser.textContent = state.currentUser.name;
+    loggedInUser.textContent =
+        `${state.currentUser.name} (${state.currentUser.role})`;
+
+    const role = getCurrentRole();
+
+    const settingsMenu =
+        document.getElementById('settings-menu');
+
+    if (settingsMenu) {
+
+        settingsMenu.style.display =
+            role === 'Administrator'
+                ? ''
+                : 'none';
+
+    }
     
     updateInventoryCache();
     updateDashboardStats();
