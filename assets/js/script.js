@@ -3155,6 +3155,9 @@ async function viewUserProfile(username) {
     }
     
     const isCurrentUser = state.currentUser && state.currentUser.username === username;
+
+    const isActive =
+        isCurrentUser;
     
     const profileHTML = `
         <div style="text-align: left; padding: 20px;">
