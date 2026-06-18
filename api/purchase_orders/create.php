@@ -28,7 +28,7 @@ try {
 
     $db->beginTransaction();
 
-    $reference_no = time();
+    $reference_no = date('YmdHis');
 
     $stmtPO = $db->query("
         SELECT IFNULL(MAX(id), 0) + 1 AS next_po
