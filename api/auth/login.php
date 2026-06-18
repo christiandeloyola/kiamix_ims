@@ -8,6 +8,11 @@ require_once '../../config/database.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
+file_put_contents(
+    'login_debug.txt',
+    print_r($data, true)
+);
+
 $database = new Database();
 $pdo = $database->connect();
 
