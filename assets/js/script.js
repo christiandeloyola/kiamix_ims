@@ -305,7 +305,6 @@ function showNotification(message, type = 'success') {
 // ============================================
 const loginPage = document.getElementById('login-page');
 const appContainer = document.getElementById('app-container');
-const loginForm = document.querySelector('.login-form');
 const registerForm = document.querySelector('.register-form');
 const loginBtn = document.getElementById('login-btn');
 const registerBtn = document.getElementById('register-btn');
