@@ -35,48 +35,6 @@ async function createUser(userData) {
     return await response.json();
 }
 
-async function loginUser(usernameOrEmail, password, role) {
-
-    const users = await getUsers();
-
-    const loginValue =
-        usernameOrEmail.trim().toLowerCase();
-
-    const loginRole =
-        role.trim().toLowerCase();
-
-    return users.find(user => {
-
-        const username =
-            (user.username || '')
-                .trim()
-                .toLowerCase();
-
-        const email =
-            (user.email || '')
-                .trim()
-                .toLowerCase();
-
-        const userPassword =
-            (user.password || '')
-                .trim();
-
-        const userRole =
-            (user.role || '')
-                .trim()
-                .toLowerCase();
-
-        return (
-            (username === loginValue ||
-             email === loginValue) &&
-            userPassword === password &&
-            userRole === loginRole
-        );
-
-    });
-
-}
-
 const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 
@@ -134,92 +92,8 @@ function getStatusBadgeClass(status) {
 }
 
 // ============================================
-// MIGRATION FUNCTION - FIX EXISTING ORDERS
-// ============================================
-function migrateExistingOrders() {
-    const orders = JSON.parse(localStorage.getItem('coffeeShopOrders') || '[]');
-    let needsUpdate = false;
-    
-    orders.forEach(order => {
-        if (!order.shippingMethod && order.shippingMethodDisplay) {
-            const displayToMethod = {
-                'Standard Shipping': 'ground',
-                'Express Delivery': 'express',
-                'Supplier Pickup': 'pickup',
-                'Local Delivery': 'local'
-            };
-            order.shippingMethod = displayToMethod[order.shippingMethodDisplay] || 'ground';
-            needsUpdate = true;
-        }
-        if (!order.shippingMethod && !order.shippingMethodDisplay) {
-            order.shippingMethod = 'ground';
-            order.shippingMethodDisplay = 'Standard Shipping';
-            needsUpdate = true;
-        }
-        if (!order.hasOwnProperty('deliveredAt')) {
-            order.deliveredAt = null;
-            needsUpdate = true;
-        }
-    });
-    
-    if (needsUpdate) {
-        localStorage.setItem('coffeeShopOrders', JSON.stringify(orders));
-        console.log('✅ Existing orders migrated');
-    }
-}
-
-// ============================================
 // INITIALIZATION FUNCTIONS
 // ============================================
-function initializeData() {
-    if (!localStorage.getItem('coffeeShopInventory')) {
-        const defaultItems = [
-            { id: 1, name: 'Arabica Coffee Beans', category: 'coffee', quantity: 25, unit: 'kg', price: 950.99, supplier: 'Coffee Supply Co.', minQuantity: 5, status: 'in-stock', description: 'Premium Arabica beans from Colombia' },
-            { id: 2, name: 'Espresso Roast', category: 'coffee', quantity: 18, unit: 'kg', price: 1125.50, supplier: 'Coffee Supply Co.', minQuantity: 5, status: 'in-stock', description: 'Dark roast for espresso' },
-            { id: 3, name: 'Green Tea Leaves', category: 'tea', quantity: 8, unit: 'kg', price: 637.75, supplier: 'Tea Imports Ltd.', minQuantity: 3, status: 'low-stock', description: 'Organic green tea leaves' },
-            { id: 4, name: 'Croissants', category: 'pastry', quantity: 48, unit: 'unit', price: 62.50, supplier: 'Bakery Supply Inc.', minQuantity: 20, status: 'in-stock', description: 'Freshly baked croissants' },
-            { id: 5, name: 'Vanilla Syrup', category: 'syrup', quantity: 12, unit: 'liter', price: 449.99, supplier: 'Coffee Supply Co.', minQuantity: 5, status: 'in-stock', description: 'Pure vanilla syrup' },
-            { id: 6, name: 'Whole Milk', category: 'milk', quantity: 15, unit: 'liter', price: 74.49, supplier: 'Dairy Distributors', minQuantity: 10, status: 'in-stock', description: 'Fresh whole milk' },
-            { id: 7, name: 'Paper Cups (12oz)', category: 'cup', quantity: 1200, unit: 'unit', price: 6.00, supplier: 'Packaging Company', minQuantity: 500, status: 'in-stock', description: 'Eco-friendly paper cups' },
-            { id: 8, name: 'Coffee Filters', category: 'cleaning', quantity: 300, unit: 'unit', price: 4.00, supplier: 'Coffee Supply Co.', minQuantity: 200, status: 'in-stock', description: '#4 coffee filters' }
-        ];
-        localStorage.setItem('coffeeShopInventory', JSON.stringify(defaultItems));
-    }
-
-    if (!localStorage.getItem('coffeeShopOrders')) {
-        localStorage.setItem('coffeeShopOrders', JSON.stringify([]));
-    }
-
-    if (!localStorage.getItem('coffeeShopSuppliers')) {
-        const defaultSuppliers = [
-            { id: 1, name: 'Coffee Supply Co.', contact: 'John Smith', phone: '555-0123', email: 'john@coffeesupply.com', items: 'Coffee beans, syrups, filters' },
-            { id: 2, name: 'Tea Imports Ltd.', contact: 'Sarah Johnson', phone: '555-0124', email: 'sarah@teaimports.com', items: 'Tea leaves, herbal teas' },
-            { id: 3, name: 'Bakery Supply Inc.', contact: 'Michael Brown', phone: '555-0125', email: 'michael@bakerysupply.com', items: 'Pastries, baked goods' },
-            { id: 4, name: 'Dairy Distributors', contact: 'Emily Davis', phone: '555-0126', email: 'emily@dairydist.com', items: 'Milk, cream, dairy products' },
-            { id: 5, name: 'Packaging Company', contact: 'Robert Wilson', phone: '555-0127', email: 'robert@packagingco.com', items: 'Cups, lids, napkins' }
-        ];
-        localStorage.setItem('coffeeShopSuppliers', JSON.stringify(defaultSuppliers));
-    }
-
-    if (!localStorage.getItem('coffeeShopSettings')) {
-        const defaultSettings = {
-            shopName: 'KiAMiX CoffeeBar',
-            shopAddress: '72 A. Mabini St, Rodriguez, Rizal (1860)',
-            contactEmail: 'founder@kiamixcoffeebar.com',
-            contactPhone: '0917 145 5202',
-            lastUpdated: new Date().toISOString(),
-            updatedBy: 'system'
-        };
-        localStorage.setItem('coffeeShopSettings', JSON.stringify(defaultSettings));
-    }
-
-    if (!localStorage.getItem('activeSessions')) {
-        localStorage.setItem('activeSessions', JSON.stringify([]));
-    }
-    
-    updateInventoryCache();
-}
-
 async function updateInventoryCache() {
     try {
 
@@ -354,21 +228,10 @@ const regPasswordToggle = document.getElementById('reg-password-toggle');
 const loginPasswordInput = document.getElementById('login-password');
 const regPasswordInput = document.getElementById('reg-password');
 
-// Initialize data
-initializeData();
-
 // ============================================
 // EVENT LISTENERS
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    migrateExistingOrders();
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-        state.currentUser = JSON.parse(savedUser);
-        state.isLoggedIn = true;
-        showApp();
-    }
-
     const today = new Date().toISOString().split('T')[0];
     const poDateInput = document.getElementById('po-date');
     if (poDateInput) poDateInput.value = today;
@@ -461,12 +324,6 @@ loginBtn.addEventListener('click', async function() {
         showNotification('Please enter username/email and password', 'error');
         return;
     }
-
-    const user = await loginUser(
-        usernameOrEmail,
-        password,
-        role
-    );
 
     if (user) {
         state.currentUser = user;
@@ -4692,8 +4549,6 @@ function initializeGeneralSettings() {
 
 // Initialize everything
 document.addEventListener('DOMContentLoaded', function() {
-    initializeData();
-    migrateExistingOrders();
     initializePOItemEventListeners();
     initializeGeneralSettings();
 
