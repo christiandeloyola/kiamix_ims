@@ -531,6 +531,7 @@ function showApp() {
     loadSuppliers();
     
     setActiveMenuItem('dashboard');
+    showPage('dashboard');
 }
 
 function showLoginPage() {
@@ -621,20 +622,50 @@ function setActiveMenuItem(pageId) {
 }
 
 function showPage(pageId) {
-    pages.forEach(page => page.classList.remove('active'));
-    const targetPage = document.getElementById(pageId);
-    
-    if (targetPage) {
-        targetPage.classList.add('active');
-        
-        if (pageId === 'dashboard') {
+
+    pages.forEach(page =>
+        page.classList.remove('active')
+    );
+
+    const targetPage =
+        document.getElementById(pageId);
+
+    if (!targetPage) {
+
+        showPage('dashboard');
+        return;
+    }
+
+    targetPage.classList.add('active');
+
+    switch (pageId) {
+
+        case 'dashboard':
             updateDashboardStats();
             loadRecentItems();
-        } else if (pageId === 'view-inventory') {
+            break;
+
+        case 'view-inventory':
             loadInventoryItems();
-        } else if (pageId === 'view-orders') {
+            break;
+
+        case 'view-orders':
             loadPurchaseOrders();
-        } else if (pageId === 'user-management') {
+            break;
+
+        case 'suppliers':
+            loadSuppliers();
+            break;
+
+        case 'reports':
+            generateReport();
+            break;
+
+        case 'settings-general':
+            loadGeneralSettings();
+            break;
+
+        case 'user-management':
 
             if (
                 getCurrentRole() !==
@@ -647,43 +678,30 @@ function showPage(pageId) {
                 );
 
                 showPage('dashboard');
-
                 return;
             }
 
             loadUsers();
             loadActiveSessions();
-        }
-        } else if (pageId === 'suppliers') {
-            loadSuppliers();
-        } else if (pageId === 'reports') {
-            generateReport();
-        } else if (pageId === 'settings-general') {
-            loadGeneralSettings();
-        } else if (pageId === 'purchase-order') {
+            break;
+
+        case 'purchase-order':
+
             loadNextPONumber();
+
             loadSuppliersForDropdowns();
-            const poSupplierSelect = document.getElementById('po-supplier');
-            if (poSupplierSelect) poSupplierSelect.value = '';
-            
-            const poItemsContainer = document.getElementById('po-items-container');
-            if (poItemsContainer) {
-                const firstItem = poItemsContainer.querySelector('.po-item');
-                if (firstItem) {
-                    const itemSelect = firstItem.querySelector('.po-item-select');
-                    if (itemSelect) itemSelect.innerHTML = '<option value="">Select an item</option>';
-                    const priceInput = firstItem.querySelector('.po-item-price');
-                    if (priceInput) priceInput.value = '0.00';
-                    const totalInput = firstItem.querySelector('.po-item-total');
-                    if (totalInput) totalInput.value = '₱0.00';
-                    const deleteBtnContainer = firstItem.querySelector('.form-group:last-child');
-                    if (deleteBtnContainer) deleteBtnContainer.style.visibility = 'hidden';
-                }
-            }
+
+            const poSupplier =
+                document.getElementById(
+                    'po-supplier'
+                );
+
+            if (poSupplier)
+                poSupplier.value = '';
+
             updatePOTotal();
-        }
-    else {
-        showPage('dashboard');
+
+            break;
     }
 }
 
