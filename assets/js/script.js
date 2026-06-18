@@ -4325,87 +4325,154 @@ function initializeReports() {
 }
 
 function generateReport() {
+
     console.log('generateReport() called');
 
-    const period = document.getElementById('report-period')?.value || 'week';
-    const category = document.getElementById('report-category')?.value || 'all';
-    
-    let startDate, endDate;
+    const period =
+        document.getElementById('report-period')?.value || 'week';
+
+    const category =
+        document.getElementById('report-category')?.value || 'all';
+
+    let startDate = '';
+    let endDate = '';
+
     const today = new Date();
-    
-    switch(period) {
+
+    switch (period) {
+
         case 'today':
-            startDate = new Date(today);
-            endDate = new Date(today);
+            startDate = today.toISOString().split('T')[0];
+            endDate = today.toISOString().split('T')[0];
             break;
+
         case 'week':
-            startDate = new Date(today);
-            startDate.setDate(today.getDate() - 7);
-            endDate = new Date(today);
+            {
+                const start = new Date();
+                start.setDate(today.getDate() - 7);
+
+                startDate = start.toISOString().split('T')[0];
+                endDate = today.toISOString().split('T')[0];
+            }
             break;
+
         case 'month':
-            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-            endDate = new Date(today);
+            {
+                const start = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    1
+                );
+
+                startDate = start.toISOString().split('T')[0];
+                endDate = today.toISOString().split('T')[0];
+            }
             break;
+
         case 'quarter':
-            const quarter = Math.floor(today.getMonth() / 3);
-            startDate = new Date(today.getFullYear(), quarter * 3, 1);
-            endDate = new Date(today);
+            {
+                const quarter =
+                    Math.floor(today.getMonth() / 3);
+
+                const start = new Date(
+                    today.getFullYear(),
+                    quarter * 3,
+                    1
+                );
+
+                startDate = start.toISOString().split('T')[0];
+                endDate = today.toISOString().split('T')[0];
+            }
             break;
+
         case 'year':
-            startDate = new Date(today.getFullYear(), 0, 1);
-            endDate = new Date(today);
+            {
+                const start = new Date(
+                    today.getFullYear(),
+                    0,
+                    1
+                );
+
+                startDate = start.toISOString().split('T')[0];
+                endDate = today.toISOString().split('T')[0];
+            }
             break;
+
         case 'custom':
-            startDate = new Date(document.getElementById('report-start-date').value);
-            endDate = new Date(document.getElementById('report-end-date').value);
+            startDate =
+                document.getElementById('report-start-date')?.value || '';
+
+            endDate =
+                document.getElementById('report-end-date')?.value || '';
             break;
     }
-    
-    console.log('Fetching report data...');
 
-    fetch('api/reports/dashboard.php')
-    .then(response => response.json())
-    .then(data => {
-
-        console.log('Report API Response:', data);
-
-        document.getElementById('report-total-items').textContent =
-            data.total_items;
-
-        document.getElementById('report-total-value').textContent =
-            '₱' + Number(data.total_value).toLocaleString();
-
-        document.getElementById('report-low-stock').textContent =
-            data.low_stock;
-
-        loadTopItems(data.top_items);
-        loadReorderItems(data.reorder_items);
-
-        console.log("Dashboard Data:", data);
-        console.log("Inventory Items:", data.inventory_items);
-
-        generateCharts(
-            data.inventory_items || [],
-            category
-        );
-
-        showNotification(
-            'Report generated successfully',
-            'success'
-        );
-
-    })
-    .catch(error => {
-
-        console.error(error);
-
-        showNotification(
-            'Failed to load report data',
-            'error'
-        );
-
+    const params = new URLSearchParams({
+        period: period,
+        category: category,
+        start_date: startDate,
+        end_date: endDate
     });
+
+    console.log('Fetching report data...');
+    console.log(params.toString());
+
+    fetch(`api/reports/dashboard.php?${params.toString()}`)
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP Error: ${response.status}`
+                );
+            }
+
+            return response.json();
+        })
+
+        .then(data => {
+
+            console.log('Report API Response:', data);
+
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            document.getElementById('report-total-items').textContent =
+                data.total_items || 0;
+
+            document.getElementById('report-total-value').textContent =
+                '₱' + Number(
+                    data.total_value || 0
+                ).toLocaleString();
+
+            document.getElementById('report-low-stock').textContent =
+                data.low_stock || 0;
+
+            loadTopItems(data.top_items || []);
+
+            loadReorderItems(data.reorder_items || []);
+
+            generateCharts(
+                data.inventory_items || [],
+                category
+            );
+
+            showNotification(
+                'Report generated successfully',
+                'success'
+            );
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            showNotification(
+                'Failed to load report data',
+                'error'
+            );
+        });
 }
 
 function updateReportMetrics(items, orders, startDate, endDate) {
