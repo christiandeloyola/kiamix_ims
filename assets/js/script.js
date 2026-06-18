@@ -512,7 +512,10 @@ function showApp() {
 
     if (settingsMenu) {
 
-        settingsMenu.style.display = 'block';
+        settingsMenu.style.display =
+            role === 'admin'
+                ? ''
+                : 'none';
 
     }
     
