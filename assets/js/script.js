@@ -4727,10 +4727,10 @@ function exportReport() {
         }
 
         window.open(
-            `api/reports/export_inventory_pdf.php?period=${period}` +
-            `&category=${category}` +
-            `&start_date=${startDate.toISOString().split('T')[0]}` +
-            `&end_date=${endDate.toISOString().split('T')[0]}`
+            `api/reports/export_inventory_pdf.php?period=${encodeURIComponent(period)}` +
+            `&category=${encodeURIComponent(category)}` +
+            `&start_date=${encodeURIComponent(startDate)}` +
+            `&end_date=${encodeURIComponent(endDate)}`
         );
 
     } else if (choice.toUpperCase() === "CSV") {
@@ -4739,10 +4739,10 @@ function exportReport() {
             document.getElementById('report-category').value;
 
         window.location.href =
-            `api/reports/export_inventory_csv.php?period=${period}` +
+            `api/reports/export_inventory_csv.php?period=${encodeURIComponent(period)}` +
             `&category=${encodeURIComponent(category)}` +
-            `&start_date=${startDate}` +
-            `&end_date=${endDate}`;
+            `&start_date=${encodeURIComponent(startDate)}` +
+            `&end_date=${encodeURIComponent(endDate)}`;
 
     } else {
 
