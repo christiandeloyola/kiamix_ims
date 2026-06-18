@@ -543,36 +543,38 @@ sidebarMenuItems.forEach(item => {
 
     item.addEventListener('click', function(e) {
 
-        if (this.id === 'settings-toggle') {
-            return;
-        }
-
         e.preventDefault();
 
         const pageId =
             this.getAttribute('data-page');
 
-        if (this.querySelector('.arrow')) {
+        const dropdown =
+            this.parentElement.querySelector('.dropdown-menu');
 
-            const dropdown =
-                this.parentElement.querySelector('.dropdown-menu');
+        if (dropdown) {
 
             dropdown.classList.toggle('show');
 
             const arrow =
                 this.querySelector('.arrow i');
 
-            arrow.style.transform =
-                dropdown.classList.contains('show')
-                ? 'rotate(90deg)'
-                : 'rotate(0deg)';
+            if (arrow) {
+
+                arrow.style.transform =
+                    dropdown.classList.contains('show')
+                    ? 'rotate(90deg)'
+                    : 'rotate(0deg)';
+            }
 
             return;
         }
 
-        setActiveMenuItem(pageId);
+        if (pageId) {
 
-        showPage(pageId);
+            setActiveMenuItem(pageId);
+
+            showPage(pageId);
+        }
 
     });
 
