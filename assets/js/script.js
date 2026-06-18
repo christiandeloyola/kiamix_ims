@@ -3195,8 +3195,23 @@ async function editUserAccount(username) {
     console.log('Current Role:', state.currentUser.role);
     console.log('Editing User:', username);
 
-    if (getCurrentRole() !== 'Administrator' && state.currentUser.username !== username) {
-        showNotification('You can only edit your own account. Only administrators can edit other users.', 'error');
+    const currentRole = String(
+        state.currentUser?.role || ''
+    ).trim().toLowerCase();
+
+    const editingOwnAccount =
+        state.currentUser.username === user.username;
+
+    const isAdministrator =
+        currentRole === 'administrator';
+
+    if (!isAdministrator && !editingOwnAccount) {
+
+        showNotification(
+            'You can only edit your own account. Only administrators can edit other users.',
+            'error'
+        );
+
         return;
     }
     
@@ -3214,7 +3229,7 @@ async function editUserAccount(username) {
                     <label for="edit-email"><strong>Email Address</strong></label>
                     <input type="email" id="edit-email" value="${user.email}" style="width: 100%; padding: 8px; margin-top: 5px;">
                 </div>
-                ${getCurrentRole() === 'Administrator' ? `
+                ${getCurrentRole() === 'administrator' ? `
                     <div class="form-group">
                         <label for="edit-role"><strong>Role</strong></label>
                         <select id="edit-role"
@@ -3269,7 +3284,7 @@ async function editUserAccount(username) {
     modal.querySelector('#save-edit-btn').addEventListener('click', async function() {
         const name = modal.querySelector('#edit-name').value;
         const email = modal.querySelector('#edit-email').value;
-        const role = getCurrentRole() === 'Administrator' ? modal.querySelector('#edit-role').value : user.role;
+        const role = getCurrentRole() === 'administrator' ? modal.querySelector('#edit-role').value : user.role;
         const password = modal.querySelector('#edit-password').value;
         const confirmPassword = modal.querySelector('#edit-confirm-password').value;
         

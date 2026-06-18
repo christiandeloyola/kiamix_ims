@@ -72,9 +72,9 @@
                 <div class="form-group">
                     <label for="reg-role"><i class="fas fa-user-tag"></i> Account Type</label>
                     <select id="reg-role">
-                        <option value="staff">Staff Member</option>
-                        <option value="manager">Store Manager</option>
-                        <option value="admin">Administrator</option>
+                        <option value="Staff">Staff Member</option>
+                        <option value="Store Manager">Store Manager</option>
+                        <option value="Administrator">Administrator</option>
                     </select>
                 </div>
                 <button class="btn btn-success" id="register-btn">Register <i class="fas fa-user-check"></i></button>
