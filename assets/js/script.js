@@ -20,9 +20,11 @@ async function loadCurrentUser() {
 
         const result = await response.json();
 
-        if(result.success){
+        if (result.success) {
 
-            currentUserRole = result.role;
+            currentUserRole =
+                result.user.role;
+
         }
 
     } catch(error){
@@ -339,22 +341,78 @@ showLogin.addEventListener('click', function(e) {
 
 // Login Functionality
 loginBtn.addEventListener('click', async function() {
-    const usernameOrEmail = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-    const role = document.getElementById('login-role').value;
+
+    const usernameOrEmail =
+        document.getElementById('login-username').value.trim();
+
+    const password =
+        document.getElementById('login-password').value;
+
+    const role =
+        document.getElementById('login-role').value;
 
     if (!usernameOrEmail || !password) {
-        showNotification('Please enter username/email and password', 'error');
+
+        showNotification(
+            'Please enter username/email and password',
+            'error'
+        );
+
         return;
     }
 
-    if (user) {
-        state.currentUser = user;
-        state.isLoggedIn = true;
-        showApp();
-        showNotification(`Welcome back, ${user.fullname}!`, 'success');
-    } else {
-        showNotification('Invalid username/email, password, or role', 'error');
+    try {
+
+        const response = await fetch(
+            'api/auth/login.php',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: usernameOrEmail,
+                    password: password,
+                    role: role
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (result.success) {
+
+            state.currentUser = result.user;
+
+            state.isLoggedIn = true;
+
+            await loadCurrentUser();
+
+            showApp();
+
+            showNotification(
+                `Welcome back, ${result.user.fullname}!`,
+                'success'
+            );
+
+        } else {
+
+            showNotification(
+                result.message,
+                'error'
+            );
+
+        }
+
+    } catch(error) {
+
+        console.error(error);
+
+        showNotification(
+            'Login failed',
+            'error'
+        );
+
     }
 });
 
