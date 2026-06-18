@@ -3164,7 +3164,7 @@ async function editUserAccount(username) {
     
     document.body.appendChild(modal);
     
-    modal.querySelector('#save-edit-btn').addEventListener('click', function() {
+    modal.querySelector('#save-edit-btn').addEventListener('click', async function() {
         const name = modal.querySelector('#edit-name').value;
         const email = modal.querySelector('#edit-email').value;
         const role = state.currentUser.role === 'Administrator' ? modal.querySelector('#edit-role').value : user.role;
