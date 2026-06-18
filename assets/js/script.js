@@ -39,12 +39,42 @@ async function loginUser(usernameOrEmail, password, role) {
 
     const users = await getUsers();
 
-    return users.find(u =>
-        (u.username === usernameOrEmail ||
-         u.email === usernameOrEmail) &&
-        u.password === password &&
-        u.role === role
-    );
+    const loginValue =
+        usernameOrEmail.trim().toLowerCase();
+
+    const loginRole =
+        role.trim().toLowerCase();
+
+    return users.find(user => {
+
+        const username =
+            (user.username || '')
+                .trim()
+                .toLowerCase();
+
+        const email =
+            (user.email || '')
+                .trim()
+                .toLowerCase();
+
+        const userPassword =
+            (user.password || '')
+                .trim();
+
+        const userRole =
+            (user.role || '')
+                .trim()
+                .toLowerCase();
+
+        return (
+            (username === loginValue ||
+             email === loginValue) &&
+            userPassword === password &&
+            userRole === loginRole
+        );
+
+    });
+
 }
 
 const loginForm = document.getElementById('login-form');
@@ -546,7 +576,7 @@ function showApp() {
     appContainer.classList.remove('hidden');
     
     loggedInUser.textContent =
-        `${state.currentUser.name} (${state.currentUser.role})`;
+        `${state.currentUser.fullname} (${state.currentUser.role})`;
 
     const role =
         (state.currentUser?.role || '')
