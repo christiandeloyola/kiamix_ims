@@ -447,14 +447,14 @@
                                     <label for="report-category">Category Filter</label>
                                     <select id="report-category">
                                         <option value="all">All Categories</option>
-                                        <option value="coffee">Coffee Beans</option>
-                                        <option value="tea">Tea & Herbal</option>
-                                        <option value="pastry">Pastries & Food</option>
-                                        <option value="syrup">Syrups & Flavorings</option>
-                                        <option value="milk">Milk & Dairy</option>
-                                        <option value="cup">Cups & Packaging</option>
-                                        <option value="cleaning">Cleaning Supplies</option>
-                                        <option value="equipment">Equipment</option>
+                                        <option value="Coffee Beans">Coffee Beans</option>
+                                        <option value="Tea & Herbal">Tea & Herbal</option>
+                                        <option value="Pastries & Food">Pastries & Food</option>
+                                        <option value="Syrups & Flavorings">Syrups & Flavorings</option>
+                                        <option value="Milk & Dairy">Milk & Dairy</option>
+                                        <option value="Cups & Packaging">Cups & Packaging</option>
+                                        <option value="Cleaning Supplies">Cleaning Supplies</option>
+                                        <option value="Equipment">Equipment</option>
                                     </select>
                                 </div>
                             </div>
