@@ -1,6 +1,32 @@
 <?php
 
+session_start();
+
 header("Content-Type: application/json");
+
+if (!isset($_SESSION['user_id'])) {
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Unauthorized"
+    ]);
+
+    exit();
+}
+
+if (
+    $_SESSION['role'] !== 'Administrator'
+    &&
+    $_SESSION['role'] !== 'Store Manager'
+){
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Access denied"
+    ]);
+
+    exit();
+}
 
 include_once "../../config/database.php";
 

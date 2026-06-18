@@ -554,7 +554,24 @@ function showPage(pageId) {
         } else if (pageId === 'view-orders') {
             loadPurchaseOrders();
         } else if (pageId === 'user-management') {
+
+            if (
+                getCurrentRole() !==
+                'administrator'
+            ) {
+
+                showNotification(
+                    'Access Denied',
+                    'error'
+                );
+
+                showPage('dashboard');
+
+                return;
+            }
+
             loadUsers();
+        }
         } else if (pageId === 'suppliers') {
             loadSuppliers();
         } else if (pageId === 'reports') {
@@ -583,7 +600,7 @@ function showPage(pageId) {
             }
             updatePOTotal();
         }
-    } else {
+    else {
         showPage('dashboard');
     }
 }
@@ -806,11 +823,16 @@ async function loadInventoryItems() {
                         Edit
                     </button>
 
-                    <button
-                        class="action-btn delete"
-                        data-id="${item.id}">
-                        Delete
-                    </button>
+                    ${getCurrentRole() === 'administrator'
+                        ? `
+                            <button
+                                class="action-btn delete"
+                                data-id="${item.id}">
+                                Delete
+                            </button>
+                          `
+                        : ''
+                    }
 
                 </td>
             `;

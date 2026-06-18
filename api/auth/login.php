@@ -31,11 +31,18 @@ if(!$user){
     exit;
 }
 
-if($user['password'] !== $data['password']){
+if(
+    !password_verify(
+        $data['password'],
+        $user['password']
+    )
+){
+
     echo json_encode([
         'success' => false,
         'message' => 'Invalid password'
     ]);
+
     exit;
 }
 

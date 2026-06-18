@@ -1,6 +1,28 @@
 <?php
 
+session_start();
+
 header("Content-Type: application/json");
+
+if (!isset($_SESSION['user_id'])) {
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Unauthorized"
+    ]);
+
+    exit();
+}
+
+if ($_SESSION['role'] !== 'Administrator') {
+
+    echo json_encode([
+        "success" => false,
+        "message" => "Only Administrators can delete inventory"
+    ]);
+
+    exit();
+}
 
 include_once "../../config/database.php";
 require_once "../logs/audit.php";
@@ -33,7 +55,7 @@ if($stmt->execute()){
 
     logAction(
         $db,
-        1,
+        $_SESSION['user_id'],
         'DELETE',
         'INVENTORY',
         'Deleted inventory item ID: ' . $id
