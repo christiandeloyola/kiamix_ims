@@ -4412,8 +4412,8 @@ function generateReport() {
     switch (period) {
 
         case 'today':
-            startDate = formatLocalDate(today);
-            endDate = formatLocalDate(today);
+            startDate = today.toLocaleDateString('en-CA');
+            endDate = today.toLocaleDateString('en-CA');
             break;
 
         case 'week':
@@ -4421,8 +4421,8 @@ function generateReport() {
                 const start = new Date();
                 start.setDate(today.getDate() - 7);
 
-                startDate = formatLocalDate(start);
-                endDate = formatLocalDate(today);
+                startDate = start.toLocaleDateString('en-CA');
+                endDate = today.toLocaleDateString('en-CA');
             }
             break;
 
@@ -4434,8 +4434,8 @@ function generateReport() {
                     1
                 );
 
-                startDate = formatLocalDate(start);
-                endDate = formatLocalDate(today);
+                startDate = start.toLocaleDateString('en-CA');
+                endDate = today.toLocaleDateString('en-CA');
             }
             break;
 
@@ -4450,8 +4450,8 @@ function generateReport() {
                     1
                 );
 
-                startDate = formatLocalDate(start);
-                endDate = formatLocalDate(today);
+                startDate = start.toLocaleDateString('en-CA');
+                endDate = today.toLocaleDateString('en-CA');
             }
             break;
 
@@ -4463,8 +4463,8 @@ function generateReport() {
                     1
                 );
 
-                startDate = formatLocalDate(start);
-                endDate = formatLocalDate(today);
+                startDate = start.toLocaleDateString('en-CA');
+                endDate = today.toLocaleDateString('en-CA');
             }
             break;
 
@@ -4726,6 +4726,10 @@ function loadReorderItems(reorderItems) {
 
 }
 
+function formatLocalDate(date) {
+    return date.toLocaleDateString('en-CA');
+}
+
 function exportReport() {
 
     const choice = prompt(
@@ -4789,11 +4793,8 @@ function exportReport() {
                     break;
             }
 
-            startDate =
-                startDate.toISOString().split('T')[0];
-
-            endDate =
-                endDate.toISOString().split('T')[0];
+            startDate = formatLocalDate(startDate);
+            endDate = formatLocalDate(endDate);
         }
 
         window.open(
@@ -4829,16 +4830,16 @@ function exportReport() {
             switch (period) {
 
                 case 'today':
-                    startDate = today.toISOString().split('T')[0];
-                    endDate = today.toISOString().split('T')[0];
+                    startDate = formatLocalDate(today);
+                    endDate = formatLocalDate(today);
                     break;
 
                 case 'week':
                     const weekStart = new Date(today);
                     weekStart.setDate(today.getDate() - 7);
 
-                    startDate = weekStart.toISOString().split('T')[0];
-                    endDate = today.toISOString().split('T')[0];
+                    startDate = formatLocalDate(weekStart);
+                    endDate = formatLocalDate(today);
                     break;
 
                 case 'month':
@@ -4848,8 +4849,8 @@ function exportReport() {
                         1
                     );
 
-                    startDate = monthStart.toISOString().split('T')[0];
-                    endDate = today.toISOString().split('T')[0];
+                    startDate = formatLocalDate(monthStart);
+                    endDate = formatLocalDate(today);
                     break;
 
                 case 'year':
@@ -4859,8 +4860,8 @@ function exportReport() {
                         1
                     );
 
-                    startDate = yearStart.toISOString().split('T')[0];
-                    endDate = today.toISOString().split('T')[0];
+                    startDate = formatLocalDate(yearStart);
+                    endDate = formatLocalDate(today);
                     break;
             }
         }
