@@ -55,7 +55,6 @@ try {
             expected_date,
             status,
             shipping_method,
-            attachment_count,
             total_amount,
             created_by
         )
@@ -68,7 +67,6 @@ try {
             :expected_date,
             'Pending',
             :shipping_method,
-            :attachment_count,
             :total_amount,
             :created_by
         )
@@ -83,7 +81,6 @@ try {
         ":order_date" => $data->order_date,
         ":expected_date" => $data->expected_date,
         ":shipping_method" => $data->shipping_method ?? 'Ground',
-        ":attachment_count" => $data->attachment_count ?? 0,
         ":total_amount" => $total_amount,
         ":created_by" => 1
     ]);

@@ -377,29 +377,6 @@
                                         <option value="Local">Local Delivery</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label for="po-shipping-notes">Shipping Notes</label>
-                                    <input type="text" id="po-shipping-notes" placeholder="Special delivery instructions">
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label style="margin-bottom: 10px;">
-                                    <i class="fas fa-paperclip"></i> Attachments (Add quotes, specifications, documents)
-                                </label>
-                                <div class="attachments-container">
-                                    <div class="attachment-input">
-                                        <input type="file" id="po-attachment-1" class="po-attachment" data-id="1" accept=".pdf,.doc,.docx,.jpg,.png,.xls,.xlsx">
-                                        <label for="po-attachment-1" class="attachment-label">
-                                            <i class="fas fa-plus"></i> Add Attachment
-                                        </label>
-                                    </div>
-                                    <div id="attachment-list" class="attachment-list">
-                                    </div>
-                                </div>
-                                <p style="font-size: 12px; color: #8d6e63; margin-top: 5px;">
-                                    Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG, XLS, XLSX
-                                </p>
                             </div>
                             
                             <h3 style="margin: 25px 0 15px; color: #5d4037;">Order Items</h3>
@@ -651,7 +628,6 @@
                                         <th>Status</th>
                                         <th>Shipping Method</th>
                                         <th>Total Amount</th>
-                                        <th>Attachments</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>

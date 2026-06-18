@@ -900,78 +900,6 @@ textarea:focus {
     justify-content: center;
 }
 
-/* Attachments Styles */
-.attachments-container {
-    border: 2px dashed #d7ccc8;
-    border-radius: 8px;
-    padding: 15px;
-    background-color: #f9f5f0;
-}
-
-.attachment-input {
-    margin-bottom: 10px;
-}
-
-.po-attachment {
-    display: none;
-}
-
-.attachment-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 15px;
-    background: linear-gradient(to right, #a1887f, #8d6e63);
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.attachment-label:hover {
-    background: linear-gradient(to right, #8d6e63, #6d4c41);
-    transform: translateY(-2px);
-}
-
-.attachment-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.attachment-preview {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background-color: white;
-    border: 1px solid #e0d6d0;
-    border-radius: 5px;
-    max-width: 250px;
-}
-
-.attachment-preview i {
-    color: #8d6e63;
-}
-
-.attachment-name {
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 14px;
-}
-
-.remove-attachment {
-    background: none;
-    border: none;
-    color: #f44336;
-    cursor: pointer;
-    padding: 0;
-    font-size: 16px;
-}
-
 /* Order Details Section */
 .order-details-section {
     margin-bottom: 20px;
@@ -998,18 +926,6 @@ textarea:focus {
 .action-btn.small {
     padding: 4px 8px;
     font-size: 12px;
-}
-
-/* Attachment Icon */
-.attachment-icon {
-    font-size: 20px;
-    color: #8d6e63;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.attachment-icon:hover {
-    color: #5d4037;
 }
 
 /* Filter Bar */
@@ -1191,14 +1107,6 @@ textarea:focus {
     
     .order-actions {
         flex-direction: column;
-    }
-    
-    .attachment-list {
-        flex-direction: column;
-    }
-    
-    .attachment-preview {
-        max-width: 100%;
     }
     
     .logo h1 {

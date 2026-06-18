@@ -17,7 +17,6 @@ SELECT
     po.expected_date,
     po.status,
     po.shipping_method,
-    po.attachment_count,
     po.total_amount,
     po.created_by,
     po.created_at,

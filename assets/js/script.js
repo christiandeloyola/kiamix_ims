@@ -8,9 +8,6 @@ const state = {
     currentPage: 'dashboard'
 };
 
-// Attachments array
-let attachments = [];
-
 // Inventory items cache for PO item price lookup
 let inventoryItemsCache = [];
 
@@ -345,9 +342,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (customRange) customRange.style.display = this.value === 'custom' ? 'flex' : 'none';
     });
     
-    const attachmentInput = document.getElementById('po-attachment-1');
-    if (attachmentInput) attachmentInput.addEventListener('change', handleAttachmentUpload);
-    
     const orderFilterStatus = document.getElementById('order-filter-status');
     const orderFilterSupplier = document.getElementById('order-filter-supplier');
     const orderFilterDate = document.getElementById('order-filter-date');
@@ -603,7 +597,6 @@ function showPage(pageId) {
         } else if (pageId === 'purchase-order') {
             loadNextPONumber();
             loadSuppliersForDropdowns();
-            clearAttachments();
             const poSupplierSelect = document.getElementById('po-supplier');
             if (poSupplierSelect) poSupplierSelect.value = '';
             
@@ -1923,10 +1916,8 @@ function clearPurchaseOrderForm() {
     document.getElementById('po-expected-date').value = expectedDate.toISOString().split('T')[0];
     
     document.getElementById('po-shipping-method').value = '';
-    document.getElementById('po-shipping-notes').value = '';
     document.getElementById('po-supplier').value = '';
     
-    clearAttachments();
     updatePOTotal();
 }
 
@@ -1950,8 +1941,6 @@ submitPoBtn?.addEventListener('click', function () {
     const supplier = document.getElementById('po-supplier').value;
     const expectedDate = document.getElementById('po-expected-date').value;
     const shippingMethod = document.getElementById('po-shipping-method').value;
-    const shippingNotes = document.getElementById('po-shipping-notes').value;
-    const attachmentCount = 0;
 
     if (
         !supplier ||
@@ -2051,8 +2040,6 @@ submitPoBtn?.addEventListener('click', function () {
 
         shipping_method: shippingMethod,
 
-        attachment_count: attachmentCount,
-
         items: poItems.map(item => ({
             inventory_item_id: item.itemId,
             quantity: item.quantity,
@@ -2130,90 +2117,6 @@ submitPoBtn?.addEventListener('click', function () {
     });
 
 });
-
-// ============================================
-// ATTACHMENT FUNCTIONS
-// ============================================
-function handleAttachmentUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    if (file.size > 5 * 1024 * 1024) {
-        showNotification('File size must be less than 5MB', 'error');
-        return;
-    }
-    
-    const allowedTypes = ['application/pdf', 'application/msword', 
-                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                         'image/jpeg', 'image/png',
-                         'application/vnd.ms-excel',
-                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-    
-    if (!allowedTypes.includes(file.type)) {
-        showNotification('File type not allowed. Please upload PDF, DOC, JPG, PNG, or Excel files.', 'error');
-        return;
-    }
-    
-    const attachment = {
-        id: Date.now(),
-        name: file.name,
-        type: file.type,
-        size: formatFileSize(file.size),
-        file: file,
-        uploadedAt: new Date().toISOString()
-    };
-    
-    attachments.push(attachment);
-    createAttachmentPreview(attachment);
-    event.target.value = '';
-    showNotification('Attachment added successfully', 'success');
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-function createAttachmentPreview(attachment) {
-    const attachmentList = document.getElementById('attachment-list');
-    let fileIcon = 'fa-file';
-    if (attachment.type.includes('pdf')) fileIcon = 'fa-file-pdf';
-    else if (attachment.type.includes('word') || attachment.type.includes('document')) fileIcon = 'fa-file-word';
-    else if (attachment.type.includes('excel') || attachment.type.includes('spreadsheet')) fileIcon = 'fa-file-excel';
-    else if (attachment.type.includes('image')) fileIcon = 'fa-file-image';
-    
-    const preview = document.createElement('div');
-    preview.className = 'attachment-preview';
-    preview.innerHTML = `
-        <i class="fas ${fileIcon}"></i>
-        <span class="attachment-name" title="${attachment.name}">${attachment.name}</span>
-        <span style="font-size: 12px; color: #8d6e63;">${attachment.size}</span>
-        <button type="button" class="remove-attachment" data-id="${attachment.id}">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    attachmentList.appendChild(preview);
-    preview.querySelector('.remove-attachment').addEventListener('click', function() {
-        const attachmentId = parseInt(this.getAttribute('data-id'));
-        removeAttachment(attachmentId, preview);
-    });
-}
-
-function removeAttachment(attachmentId, previewElement) {
-    attachments = attachments.filter(att => att.id !== attachmentId);
-    previewElement.remove();
-    showNotification('Attachment removed', 'info');
-}
-
-function clearAttachments() {
-    attachments = [];
-    const attachmentList = document.getElementById('attachment-list');
-    if (attachmentList) attachmentList.innerHTML = '';
-}
 
 // ============================================
 // PURCHASE ORDERS FUNCTIONS
@@ -2372,10 +2275,6 @@ function loadPurchaseOrders() {
 
                     <td>
                         ₱${parseFloat(order.total_amount || 0).toLocaleString()}
-                    </td>
-
-                    <td>
-                        ${order.attachment_count || 0}
                     </td>
 
                     <td>
@@ -2962,7 +2861,6 @@ function printOrder(orderId) {
                 <p><strong>Supplier:</strong> ${order.supplier}</p>
                 <p><strong>Expected Delivery:</strong> ${order.expectedDate}</p>
                 <p><strong>Shipping Method:</strong> ${getShippingMethodName(order.shippingMethod || 'ground')}</p>
-                <p><strong>Shipping Notes:</strong> ${order.shippingNotes || 'None'}</p>
                 ${order.deliveredAt ? `<p><strong>Delivered On:</strong> ${new Date(order.deliveredAt).toLocaleString()}</p>` : ''}
             </div>
             <div class="section">
