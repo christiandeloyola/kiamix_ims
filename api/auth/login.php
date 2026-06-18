@@ -8,10 +8,17 @@ require_once '../../config/database.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-file_put_contents(
-    'login_debug.txt',
-    print_r($data, true)
-);
+if (
+    empty($data['username']) ||
+    empty($data['password']) ||
+    empty($data['role'])
+) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'All fields are required'
+    ]);
+    exit;
+}
 
 $database = new Database();
 $pdo = $database->connect();
@@ -20,10 +27,12 @@ $stmt = $pdo->prepare("
     SELECT *
     FROM users
     WHERE username = :username
+    AND role = :role
 ");
 
 $stmt->execute([
-    ':username' => $data['username']
+    ':username' => $data['username'],
+    ':role'     => $data['role']
 ]);
 
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
