@@ -518,6 +518,22 @@ function showApp() {
                 : 'none';
 
     }
+
+    const inventoryAddMenu =
+        document.querySelector('[data-page="add-inventory"]');
+
+    const suppliersMenu =
+        document.querySelector('[data-page="suppliers"]');
+
+    const reportsMenu =
+        document.querySelector('[data-page="reports"]');
+
+    if (role === 'staff') {
+
+        if (inventoryAddMenu)
+            inventoryAddMenu.style.display = 'none';
+
+    }
     
     updateInventoryCache();
     updateDashboardStats();
