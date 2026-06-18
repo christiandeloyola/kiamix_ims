@@ -52,7 +52,9 @@ const registerForm = document.getElementById('register-form');
 
 function getCurrentRole() {
 
-    return state.currentUser?.role || '';
+    return (
+        state.currentUser?.role || ''
+    ).toLowerCase().trim();
 
 }
 
@@ -546,7 +548,10 @@ function showApp() {
     loggedInUser.textContent =
         `${state.currentUser.name} (${state.currentUser.role})`;
 
-    const role = getCurrentRole();
+    const role =
+        (state.currentUser?.role || '')
+            .toLowerCase()
+            .trim();
 
     console.log("Current User:", state.currentUser);
     console.log("Current Role:", role);
@@ -557,7 +562,7 @@ function showApp() {
     if (settingsMenu) {
 
         settingsMenu.style.display =
-            role === 'Administrator'
+            role === 'admin'
                 ? 'block'
                 : 'none';
 
@@ -2574,8 +2579,8 @@ function cancelPurchaseOrder(orderId) {
         return;
     }
     
-    if (state.currentUser.role === 'Administrator' || state.currentUser.role === 'manager' || 
-        (state.currentUser.role === 'staff' && state.currentUser.username === order.createdBy)) {
+    if (getCurrentRole() === 'admin' || getCurrentRole() === 'manager' || 
+        (getCurrentRole() === 'staff' && state.currentUser.username === order.createdBy)) {
         if (!confirm(`Are you sure you want to CANCEL purchase order ${order.poNumber}?`)) return;
         
         const orderIndex = orders.findIndex(o => o.id === orderId);
@@ -3124,7 +3129,7 @@ async function viewUserProfile(username) {
                 <p><strong>Role:</strong> ${user.role}</p>
                 <p><strong>Status:</strong> <span style="color: ${isActive ? '#4caf50' : '#8d6e63'}">${isActive ? 'Currently Online' : 'Offline'}</span></p>
                 <p><strong>Account Created:</strong> ${new Date().toLocaleDateString()}</p>
-                ${state.currentUser && state.currentUser.role === 'Administrator' ? '<p><strong>Password:</strong> ********</p>' : ''}
+                ${state.currentUser && getCurrentRole() === 'admin' ? '<p><strong>Password:</strong> ********</p>' : ''}
                 ${isCurrentUser ? '<p style="color: #ffb74d; font-size: 14px;"><i class="fas fa-info-circle"></i> This is your account</p>' : ''}
             </div>
         </div>
@@ -3160,7 +3165,7 @@ async function editUserAccount(username) {
     console.log('Current Role:', state.currentUser.role);
     console.log('Editing User:', username);
 
-    if (state.currentUser.role !== 'Administrator' && state.currentUser.username !== username) {
+    if (getCurrentRole() !== 'admin' && state.currentUser.username !== username) {
         showNotification('You can only edit your own account. Only administrators can edit other users.', 'error');
         return;
     }
@@ -3179,7 +3184,7 @@ async function editUserAccount(username) {
                     <label for="edit-email"><strong>Email Address</strong></label>
                     <input type="email" id="edit-email" value="${user.email}" style="width: 100%; padding: 8px; margin-top: 5px;">
                 </div>
-                ${state.currentUser.role === 'Administrator' ? `
+                ${getCurrentRole() === 'admin' ? `
                     <div class="form-group">
                         <label for="edit-role"><strong>Role</strong></label>
                         <select id="edit-role"
@@ -3187,17 +3192,17 @@ async function editUserAccount(username) {
                             ${isCurrentUser ? 'disabled' : ''}>
 
                             <option value="Staff"
-                                ${user.role === 'Staff' ? 'selected' : ''}>
+                                ${user.role === 'staff' ? 'selected' : ''}>
                                 Staff Member
                             </option>
 
                             <option value="Store Manager"
-                                ${user.role === 'Store Manager' ? 'selected' : ''}>
+                                ${user.role === 'manager' ? 'selected' : ''}>
                                 Store Manager
                             </option>
 
                             <option value="Administrator"
-                                ${user.role === 'Administrator' ? 'selected' : ''}>
+                                ${user.role === 'admin' ? 'selected' : ''}>
                                 Administrator
                             </option>
 
@@ -3234,7 +3239,7 @@ async function editUserAccount(username) {
     modal.querySelector('#save-edit-btn').addEventListener('click', async function() {
         const name = modal.querySelector('#edit-name').value;
         const email = modal.querySelector('#edit-email').value;
-        const role = state.currentUser.role === 'Administrator' ? modal.querySelector('#edit-role').value : user.role;
+        const role = getCurrentRole() === 'admin' ? modal.querySelector('#edit-role').value : user.role;
         const password = modal.querySelector('#edit-password').value;
         const confirmPassword = modal.querySelector('#edit-confirm-password').value;
         
